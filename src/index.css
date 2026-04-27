@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand */
+    --background:   0 0% 100%;
+    --foreground:   215 33% 14%;        /* #182230 */
+
+    --card:         0 0% 100%;
+    --card-foreground: 215 33% 14%;
+
+    --popover:      0 0% 100%;
+    --popover-foreground: 215 33% 14%;
+
+    /* Primary = brand navy */
+    --primary:      208 67% 16%;        /* #0e2c46 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary = brand lime */
+    --secondary:    86 57% 47%;         /* #82bc34 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted = light gray surface */
+    --muted:        216 24% 96%;        /* #f2f4f7 */
+    --muted-foreground: 221 13% 46%;    /* #667085 */
+
+    /* Accent = focus/selected tint */
+    --accent:       77 58% 88%;         /* #e8f2ce */
+    --accent-foreground: 215 33% 14%;
+
+    /* Destructive = error red */
+    --destructive:  4 86% 58%;          /* #f04438 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border:       218 17% 84%;        /* #d0d5dd */
+    --input:        218 17% 84%;
+    --ring:         86 57% 47%;         /* #82bc34 */
+
+    --radius: 0.5rem;                   /* 8px */
+  }
+
+  .dark {
+    --background:   215 33% 9%;
+    --foreground:   216 24% 96%;
+    --card:         215 33% 11%;
+    --card-foreground: 216 24% 96%;
+    --popover:      215 33% 11%;
+    --popover-foreground: 216 24% 96%;
+    --primary:      86 57% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary:    215 20% 18%;
+    --secondary-foreground: 216 24% 96%;
+    --muted:        215 20% 18%;
+    --muted-foreground: 218 13% 65%;
+    --accent:       77 30% 20%;
+    --accent-foreground: 216 24% 96%;
+    --destructive:  0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border:       215 20% 22%;
+    --input:        215 20% 22%;
+    --ring:         86 57% 47%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
