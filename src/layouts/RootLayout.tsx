@@ -34,7 +34,7 @@ export function RootLayout() {
       {/* Column 3 — Main pane */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar />
-        <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
           <Outlet />
         </div>
       </div>

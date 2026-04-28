@@ -15,7 +15,7 @@ export default function ChatView() {
   const { messages, isTyping, addMessage, setIsTyping } = useChatStore()
   const { pendingFlowId, setPendingFlow, pendingUserMessage, setPendingUserMessage } = useAppStore()
   const { triggerFlow, sendUserMessage } = useTriggerFlow()
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const messagesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { document.title = "Chat — NeuString Co-Pilot" }, [])
 
@@ -40,9 +40,11 @@ export default function ChatView() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingUserMessage])
 
-  // Auto-scroll on new messages or typing state
+  // Auto-scroll on new messages or typing state — scroll the container directly
+  // so we never accidentally scroll a parent or the document.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    const el = messagesRef.current
+    if (el) el.scrollTop = el.scrollHeight
   }, [messages, isTyping])
 
   function handleSend(text: string) {
@@ -72,30 +74,31 @@ export default function ChatView() {
   const isEmpty = messages.length === 0 && !isTyping
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="flex-1 overflow-y-auto py-4">
-        {isEmpty && (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
-            <div className="w-12 h-12 rounded-full bg-[#0e2c46] flex items-center justify-center text-white text-xl font-bold">
-              N
+    <div className="flex-1 min-h-0 flex flex-col bg-white">
+      <div ref={messagesRef} className="flex-1 min-h-0 overflow-y-auto py-6">
+        <div className="max-w-3xl mx-auto px-6 w-full">
+          {isEmpty && (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 text-center">
+              <div className="w-12 h-12 rounded-full bg-[#0e2c46] flex items-center justify-center text-white text-xl font-bold">
+                N
+              </div>
+              <p className="text-[#667085] text-sm max-w-xs">
+                Ask me about traffic, forecasts, deals, contracts, or partner status — or select a flow from the Operations menu.
+              </p>
             </div>
-            <p className="text-[#667085] text-sm max-w-xs">
-              Ask me about traffic, forecasts, deals, contracts, or partner status — or select a flow from the Operations menu.
-            </p>
-          </div>
-        )}
+          )}
 
-        {messages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            message={msg}
-            onContractSelect={handleContractSelect}
-            onChip={triggerFlow}
-          />
-        ))}
+          {messages.map((msg) => (
+            <MessageBubble
+              key={msg.id}
+              message={msg}
+              onContractSelect={handleContractSelect}
+              onChip={triggerFlow}
+            />
+          ))}
 
-        {isTyping && <TypingIndicator />}
-        <div ref={bottomRef} />
+          {isTyping && <TypingIndicator />}
+        </div>
       </div>
 
       <ChatInput onSend={handleSend} disabled={isTyping} />

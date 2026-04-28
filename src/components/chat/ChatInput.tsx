@@ -47,6 +47,7 @@ export function ChatInput({ onSend, disabled }: Props) {
 
   return (
     <div className="border-t border-[#e4e7ec] bg-white px-4 py-3">
+      <div className="max-w-3xl mx-auto">
       <div className="flex items-end gap-2 rounded-2xl border border-[#d0d5dd] bg-[#f9fafb] px-3 py-2 focus-within:border-[#0e2c46] focus-within:ring-2 focus-within:ring-[rgba(14,44,70,0.12)] transition-all">
         <button
           aria-label="Attach file"
@@ -94,6 +95,7 @@ export function ChatInput({ onSend, disabled }: Props) {
       <p className="text-center text-[10px] text-[#98a2b3] mt-2">
         NeuString can make mistakes. Review important information.
       </p>
+      </div>
     </div>
   )
 }
