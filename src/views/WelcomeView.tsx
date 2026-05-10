@@ -63,9 +63,9 @@ export function WelcomeView() {
         </p>
 
         {/* Suggestion chips */}
-        <div className="w-full max-w-lg mt-2">
+        <div className="w-full max-w-2xl mt-2">
           <p className="text-xs font-medium text-[#667085] mb-2 text-left">Quick start</p>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {SUGGESTION_CHIPS.map((chip) => {
               const used = usedChips.includes(chip.id)
               return (
@@ -73,9 +73,8 @@ export function WelcomeView() {
                   key={chip.id}
                   onClick={() => handleChip(chip)}
                   disabled={used}
-                  className="flex items-start gap-3 rounded-xl border border-[#e4e7ec] bg-white px-4 py-3 text-left text-sm text-[#344054] hover:border-[#0e2c46] hover:bg-[#f2f4f7] hover:text-[#0e2c46] transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                  className="flex flex-col gap-2 rounded-xl border border-[#e4e7ec] bg-white px-3 py-3 text-left text-xs text-[#344054] hover:border-[#0e2c46] hover:bg-[#f2f4f7] hover:text-[#0e2c46] transition-colors disabled:opacity-50 disabled:pointer-events-none"
                 >
-                  <span className="text-base mt-0.5 flex-shrink-0">{chip.icon}</span>
                   {chip.text}
                 </button>
               )
