@@ -2,9 +2,9 @@ import { Star } from "lucide-react"
 import { DemoBadge } from "@/components/nav/DemoBadge"
 
 const STARRED = [
-  { id: "s1", title: "Q4 APAC Forecast",           category: "Analytical" as const },
-  { id: "s2", title: "Vodafone DE Rate Review",     category: "Analytical" as const },
-  { id: "s3", title: "MEA Expansion Analysis",      category: "Analytical" as const },
+  { id: "s1", title: "Q4 APAC Forecast",           category: "Queries" as const },
+  { id: "s2", title: "Vodafone DE Rate Review",     category: "Queries" as const },
+  { id: "s3", title: "MEA Expansion Analysis",      category: "Queries" as const },
 ]
 
 const CONTRACT_SESSIONS = [

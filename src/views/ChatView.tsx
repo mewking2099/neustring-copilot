@@ -23,20 +23,25 @@ export default function ChatView() {
   // and inline flow-switching while already on /chat).
   useEffect(() => {
     if (!pendingFlowId) return
-    // If there's an existing conversation, insert a labeled divider first.
-    if (useChatStore.getState().messages.length > 0) {
-      addMessage({ kind: "divider", label: FLOW_LABELS[pendingFlowId] ?? pendingFlowId })
-    }
+    // Read directly from the store to guard against StrictMode double-invocation:
+    // the second firing sees null and exits before triggering the flow again.
+    const flow = useAppStore.getState().pendingFlowId
+    if (!flow) return
     setPendingFlow(null)
-    triggerFlow(pendingFlowId)
+    if (useChatStore.getState().messages.length > 0) {
+      addMessage({ kind: "divider", label: FLOW_LABELS[flow] ?? flow })
+    }
+    triggerFlow(flow)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingFlowId])
 
   // Reactive: fires when WelcomeView hands off a free-text message.
   useEffect(() => {
     if (!pendingUserMessage) return
+    const msg = useAppStore.getState().pendingUserMessage
+    if (!msg) return
     setPendingUserMessage(null)
-    sendUserMessage(pendingUserMessage)
+    sendUserMessage(msg)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingUserMessage])
 

@@ -7,10 +7,10 @@ import { DEMO_FLOWS, isActionFlow } from "@/data/flows"
 import type { DemoFlow, NonActionFlow, ActionFlow, FlowCategory, PinnedItem } from "@/data/flows"
 import { DemoBadge } from "@/components/nav/DemoBadge"
 
-const CATEGORY_ORDER: FlowCategory[] = ["Analytical", "RoDeO", "Action"]
+const CATEGORY_ORDER: FlowCategory[] = ["Queries", "Tasks", "Functions"]
 
 function groupFlows() {
-  const groups: Record<FlowCategory, DemoFlow[]> = { Analytical: [], RoDeO: [], Action: [] }
+  const groups: Record<FlowCategory, DemoFlow[]> = { Queries: [], Tasks: [], Functions: [] }
   for (const f of DEMO_FLOWS) groups[f.category].push(f)
   return groups
 }

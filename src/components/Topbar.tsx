@@ -1,14 +1,14 @@
 import { Bell } from "lucide-react"
+import neuStringLogo from "@/assets/NeuString-logo.svg"
 
 const USER = { name: "Alex Moreau", role: "Account Manager", initials: "AM" }
 
 export function Topbar() {
   return (
     <div className="flex items-center justify-between h-14 px-6 border-b border-[#e4e7ec] bg-white shrink-0">
-      {/* Left — NeuString wordmark */}
-      <div className="flex items-center gap-1 select-none">
-        <span className="text-[#2e90fa] font-bold text-lg leading-none">Neu</span>
-        <span className="text-[#0e2c46] font-bold text-lg leading-none">String</span>
+      {/* Left — NeuString logo */}
+      <div className="flex items-center select-none">
+        <img src={neuStringLogo} alt="NeuString" className="h-7 object-contain" />
       </div>
 
       {/* Right — user strip */}

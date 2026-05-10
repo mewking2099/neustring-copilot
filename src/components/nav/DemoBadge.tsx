@@ -1,9 +1,9 @@
 import type { FlowCategory } from "@/data/flows"
 
 const CONFIG: Record<FlowCategory, { bg: string; color: string }> = {
-  Analytical: { bg: "#e8f2ce", color: "#4d7c0f" },
-  RoDeO:      { bg: "#fef3c7", color: "#92400e" },
-  Action:     { bg: "#dbeafe", color: "#1e40af" },
+  Queries:   { bg: "#e8f2ce", color: "#4d7c0f" },
+  Tasks:     { bg: "#fef3c7", color: "#92400e" },
+  Functions: { bg: "#dbeafe", color: "#1e40af" },
 }
 
 export function DemoBadge({ category }: { category: FlowCategory }) {

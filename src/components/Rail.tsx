@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import yaanaIcon from "@/assets/yaana-icon.svg"
 import { useAppStore } from "@/store/app"
 import {
   LayoutDashboard, MessageSquare, TrendingUp, DollarSign,
@@ -28,7 +29,7 @@ export function Rail() {
     <div className="w-12 flex flex-col items-center bg-[#0e2c46] py-3 gap-1 shrink-0 h-full">
       {/* Logo */}
       <div className="w-8 h-8 flex items-center justify-center mb-1">
-        <span className="text-white font-bold text-sm leading-none select-none">Ns</span>
+        <img src={yaanaIcon} alt="Yaana" className="w-7 h-7 object-contain" />
       </div>
 
       {/* Sidebar toggle */}

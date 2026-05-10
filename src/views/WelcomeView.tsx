@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import neuStringLogo from "@/assets/NeuString-logo.svg"
 import { useNavigate } from "react-router-dom"
 import { X } from "lucide-react"
 import { useAppStore } from "@/store/app"
@@ -49,9 +50,8 @@ export function WelcomeView() {
       <div className="flex flex-col items-center text-center max-w-xl w-full gap-4">
 
         {/* Logo */}
-        <div className="flex items-center gap-1 select-none mb-2">
-          <span className="text-[#2e90fa] font-bold text-4xl leading-none">Neu</span>
-          <span className="text-[#0e2c46] font-bold text-4xl leading-none">String</span>
+        <div className="flex items-center select-none mb-2">
+          <img src={neuStringLogo} alt="NeuString" className="h-12 object-contain" />
         </div>
 
         {/* Greeting */}
@@ -86,17 +86,14 @@ export function WelcomeView() {
         {pins.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mt-2 w-full max-w-lg">
             {pins.map((item) => (
-              <div key={item.id} className="group/pin flex items-center">
-                <button
-                  onClick={() => handlePin(item)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#d0d5dd] bg-white px-3 py-1.5 text-xs text-[#344054] font-medium hover:border-[#0e2c46] hover:text-[#0e2c46] transition-colors whitespace-nowrap"
-                >
+              <div key={item.id} className="group/pin inline-flex items-center gap-1.5 rounded-full border border-[#d0d5dd] bg-white px-3 py-1.5 text-xs text-[#344054] font-medium hover:border-[#0e2c46] hover:text-[#0e2c46] transition-colors whitespace-nowrap">
+                <button onClick={() => handlePin(item)} className="flex items-center gap-1.5">
                   <span className="text-xs">{item.icon}</span>
                   {item.name}
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); unpinItem(item.id) }}
-                  className="ml-1 opacity-0 group-hover/pin:opacity-60 hover:!opacity-100 text-[#667085] hover:text-[#f04438] transition-all"
+                  className="w-0 overflow-hidden group-hover/pin:w-3 opacity-0 group-hover/pin:opacity-60 hover:!opacity-100 text-[#667085] hover:text-[#f04438] transition-all"
                   title="Unpin"
                 >
                   <X className="w-3 h-3" />
