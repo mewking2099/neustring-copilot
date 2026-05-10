@@ -38,8 +38,8 @@ function NonActionItem({ flow }: { flow: NonActionFlow }) {
       className="group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm text-[#344054] hover:bg-[#f2f4f7] hover:text-[#0e2c46] transition-colors"
       onClick={handleClick}
     >
-      <span className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 bg-[#f2f4f7]">
-        {flow.icon}
+      <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#f2f4f7] text-[#344054]">
+        <flow.icon className="w-4 h-4" />
       </span>
       <div className="flex flex-col min-w-0 flex-1">
         <span className="text-sm font-medium truncate">{flow.name}</span>
@@ -85,8 +85,8 @@ function ActionItem({ flow }: { flow: ActionFlow }) {
         className="group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm text-[#344054] hover:bg-[#f2f4f7] hover:text-[#0e2c46] transition-colors"
         onClick={() => setExpanded((v) => !v)}
       >
-        <span className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 bg-[#dbeafe]">
-          {flow.icon}
+        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#dbeafe] text-[#1e40af]">
+          <flow.icon className="w-4 h-4" />
         </span>
         <span className="flex-1 text-sm font-medium">{flow.name}</span>
         <button
@@ -110,7 +110,7 @@ function ActionItem({ flow }: { flow: ActionFlow }) {
       {/* Sub-actions */}
       {expanded && (
         <div className="mb-1 space-y-0.5">
-          {flow.subActions.map((sub) => {
+          {(flow.subActions ?? []).map((sub) => {
             const subPinned = isPinned(sub.id)
             return (
               <div
@@ -118,8 +118,8 @@ function ActionItem({ flow }: { flow: ActionFlow }) {
                 className="group/sub flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm text-[#344054] hover:bg-[#f2f4f7] hover:text-[#0e2c46] transition-colors"
                 onClick={(e) => handleSubAction(e, sub.route, sub.id)}
               >
-                <span className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 bg-[#f2f4f7] ml-9">
-                  {sub.icon ?? flow.icon}
+                <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#f2f4f7] text-[#344054] ml-9">
+                  {(() => { const I = sub.icon ?? flow.icon; return <I className="w-4 h-4" /> })()}
                 </span>
                 <span className="flex-1 text-sm font-medium truncate">{sub.label}</span>
                 <button

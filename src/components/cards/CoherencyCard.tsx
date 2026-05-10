@@ -34,7 +34,7 @@ export function CoherencyCard({ onChip: _onChip }: Props) {
             <p className="text-xs text-[#0e2c46] font-medium mb-1">{f.clause}</p>
             <p className="text-xs text-[#667085] leading-relaxed mb-2">{f.conflict}</p>
             <div className="flex items-start gap-2 bg-[#f2f4f7] rounded-lg px-3 py-2">
-              <span className="text-[10px] text-[#667085] leading-relaxed">💡 {f.suggestion}</span>
+              <span className="text-[10px] text-[#667085] leading-relaxed">{f.suggestion}</span>
             </div>
             <button className="mt-2 text-xs font-medium text-[#0e2c46] border border-[#d0d5dd] rounded-full px-3 py-1 hover:border-[#0e2c46] transition-colors">
               Resolve ↗

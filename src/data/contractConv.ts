@@ -1,3 +1,8 @@
+import { AlertOctagon, AlertTriangle, Info } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
+export type { LucideIcon }
+
 // ── Shared wizard conversation types ─────────────────────────────────────────
 
 export interface WizardConvReply {
@@ -301,8 +306,8 @@ export const CONTRACT_CHANGES: ContractChange[] = [
   },
 ]
 
-export const SEV_CONFIG = {
-  Critical: { border: "#f04438", bg: "#fff5f5", color: "#b42318", icon: "🔴" },
-  Medium:   { border: "#ca8504", bg: "#fffaeb", color: "#92400e", icon: "🟡" },
-  Low:      { border: "#2e90fa", bg: "#eff8ff", color: "#175cd3", icon: "🔵" },
-} as const
+export const SEV_CONFIG: Record<string, { border: string; bg: string; color: string; icon: LucideIcon }> = {
+  Critical: { border: "#f04438", bg: "#fff5f5", color: "#b42318", icon: AlertOctagon  },
+  Medium:   { border: "#ca8504", bg: "#fffaeb", color: "#92400e", icon: AlertTriangle },
+  Low:      { border: "#2e90fa", bg: "#eff8ff", color: "#175cd3", icon: Info          },
+}

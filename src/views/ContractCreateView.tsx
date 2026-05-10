@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Lock } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Stepper } from "@/components/wizard/Stepper"
@@ -31,7 +32,7 @@ function Step1() {
       </div>
       {selected && (
         <div className="bg-[#e8f2ce] rounded-lg px-3 py-2 text-sm text-[#0e2c46] flex items-center gap-2">
-          <span>🔒</span>
+          <Lock className="w-4 h-4 text-[#0e2c46]" />
           <span>Type: <strong>{selected} Wholesale Roaming</strong></span>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { FileText } from "lucide-react"
 import type { CardProps } from "./index"
 
 type UploadState = "idle" | "uploading" | "processing"
@@ -84,7 +85,7 @@ export function ContractUploadCard({ onChip }: CardProps) {
             backgroundColor: dragOver ? "#f2f4f7" : "white",
           }}
         >
-          <div className="text-3xl mb-3">📄</div>
+          <div className="mb-3"><FileText className="w-8 h-8 text-[#98a2b3]" /></div>
           <p className="text-sm font-medium text-[#344054]">
             {dragOver ? "Drop to upload" : "Drop your contract file here"}
           </p>
@@ -108,7 +109,7 @@ export function ContractUploadCard({ onChip }: CardProps) {
     return (
       <div className="mt-3 max-w-md space-y-3">
         <div className="flex items-center gap-2">
-          <span className="text-sm">📄</span>
+          <FileText className="w-4 h-4 text-[#0e2c46]" />
           <span className="text-sm text-[#344054] font-medium truncate">{fileName}</span>
           <span className="text-xs text-[#667085] ml-auto">{progress}%</span>
         </div>

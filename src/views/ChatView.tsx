@@ -79,7 +79,7 @@ export default function ChatView() {
   const isEmpty = messages.length === 0 && !isTyping
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-white">
+    <div className="flex-1 min-h-0 flex flex-col bg-[#f2f4f7]">
       <div ref={messagesRef} className="flex-1 min-h-0 overflow-y-auto py-6">
         <div className="max-w-3xl mx-auto px-6 w-full">
           {isEmpty && (

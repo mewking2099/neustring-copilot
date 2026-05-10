@@ -14,7 +14,7 @@ function ChangeCard({ change }: { change: ContractChange }) {
   return (
     <div className="rounded-xl border overflow-hidden" style={{ borderColor: sev.border }}>
       <div className="flex items-center gap-2 px-4 py-2" style={{ backgroundColor: sev.bg }}>
-        <span className="text-sm" aria-hidden="true">{sev.icon}</span>
+        <sev.icon className="w-4 h-4 shrink-0" aria-hidden="true" style={{ color: sev.color }} />
         <span className="text-xs font-semibold" style={{ color: sev.color }}>{change.severity}</span>
         <span className="text-xs text-[#667085]">· {change.type}</span>
       </div>
@@ -30,7 +30,7 @@ function ChangeCard({ change }: { change: ContractChange }) {
           <p className="text-xs text-[#344054] leading-relaxed italic">{change.added}</p>
         </div>
         <div className="rounded-lg border-l-4 border-[#0e2c46] bg-[#f2f4f7] px-3 py-2">
-          <p className="text-[10px] font-semibold text-[#0e2c46] uppercase tracking-wide mb-1" aria-hidden="true">💡 Recommendation</p>
+          <p className="text-[10px] font-semibold text-[#0e2c46] uppercase tracking-wide mb-1">Recommendation</p>
           <p className="text-xs text-[#344054] leading-relaxed">{change.recommendation}</p>
         </div>
       </div>
@@ -70,8 +70,8 @@ export function ContractAnalysisCard({ onChip: _ }: CardProps) {
             { key: "Medium",   items: medium,   cfg: SEV_CONFIG.Medium },
             { key: "Low",      items: low,       cfg: SEV_CONFIG.Low },
           ].map(({ key, items, cfg }) => (
-            <span key={key} className="text-xs font-medium rounded-full px-2 py-0.5" style={{ backgroundColor: cfg.bg, color: cfg.color }}>
-              {cfg.icon} {items.length} {key}
+            <span key={key} className="inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5" style={{ backgroundColor: cfg.bg, color: cfg.color }}>
+              <cfg.icon className="w-3 h-3" aria-hidden="true" /> {items.length} {key}
             </span>
           ))}
         </div>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import { FileText, Zap, Wifi } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Stepper } from "@/components/wizard/Stepper"
@@ -55,10 +57,10 @@ function Step1({ onSelect }: { onSelect: () => void }) {
 }
 
 // ── Step 2 — Select Template ──────────────────────────────────────────────────
-const TEMPLATES = [
-  { icon: "📋", name: "GSMA BA.12 Standard", desc: "Full clause set with all standard protections" },
-  { icon: "⚡", name: "Simplified", desc: "Data + Voice only — removes SMS/IoT clauses" },
-  { icon: "🔌", name: "IOT-focused", desc: "NB-IoT & LTE-M APN clauses included" },
+const TEMPLATES: { icon: LucideIcon; name: string; desc: string }[] = [
+  { icon: FileText, name: "GSMA BA.12 Standard", desc: "Full clause set with all standard protections" },
+  { icon: Zap,      name: "Simplified",           desc: "Data + Voice only — removes SMS/IoT clauses" },
+  { icon: Wifi,     name: "IOT-focused",           desc: "NB-IoT & LTE-M APN clauses included" },
 ]
 
 function Step2() {
@@ -77,7 +79,7 @@ function Step2() {
               : "border-[#e4e7ec] bg-[#f2f4f7] text-[#344054] hover:border-[#0e2c46] hover:bg-[#f2f4f7]"
           )}
         >
-          <span className="text-xl shrink-0">{t.icon}</span>
+          <t.icon className="w-5 h-5 shrink-0" />
           <div>
             <p className="text-sm font-medium">{t.name}</p>
             <p className={cn("text-xs", selected === i ? "text-[#c8dde8]" : "text-[#667085]")}>{t.desc}</p>
