@@ -18,13 +18,12 @@ function groupFlows() {
 // ── Non-action flow row ────────────────────────────────────────────────────
 function NonActionItem({ flow }: { flow: NonActionFlow }) {
   const navigate = useNavigate()
-  const { isPinned, pinItem, unpinItem, setNavOpen, setPendingFlow } = useAppStore()
+  const { isPinned, pinItem, unpinItem, setPendingFlow } = useAppStore()
   const pinned = isPinned(flow.id)
 
   function handleClick() {
     setPendingFlow(flow.id)
     navigate("/chat")
-    setNavOpen(false)
   }
 
   function handlePin(e: React.MouseEvent) {

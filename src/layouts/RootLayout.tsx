@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Outlet, useLocation } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 import { Rail } from "@/components/Rail"
 import { NavSidebar } from "@/components/NavSidebar"
 import { Topbar } from "@/components/Topbar"
@@ -7,12 +7,6 @@ import { useAppStore } from "@/store/app"
 
 export function RootLayout() {
   const { setNavOpen } = useAppStore()
-  const location = useLocation()
-
-  // Auto-collapse sidebar on navigation
-  useEffect(() => {
-    setNavOpen(false)
-  }, [location.pathname, setNavOpen])
 
   // Auto-collapse sidebar below 1024px viewport width
   useEffect(() => {
