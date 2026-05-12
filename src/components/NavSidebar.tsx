@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { ChevronLeft, Plus } from "lucide-react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { springSnappy, springSmooth } from "@/lib/animations"
 import { useAppStore } from "@/store/app"
 import { useChatStore } from "@/store/chat"
 import { OperationsTab } from "@/components/nav/OperationsTab"
@@ -44,7 +45,7 @@ export function NavSidebar() {
               title="Collapse"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              transition={springSnappy}
             >
               <ChevronLeft className="w-4 h-4" />
             </motion.button>
@@ -56,7 +57,7 @@ export function NavSidebar() {
             className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[#f2f4f7] text-[#0e2c46] text-sm font-medium py-2 hover:bg-[#e4e7ec] transition-colors"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            transition={springSmooth}
           >
             <Plus className="w-4 h-4" />
             New Chat

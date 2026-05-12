@@ -116,7 +116,7 @@ export function WelcomeView() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {SUGGESTION_CHIPS.map((chip, i) => {
+              {SUGGESTION_CHIPS.map((chip) => {
                 const used = usedChips.includes(chip.id)
                 return (
                   <motion.button
@@ -129,7 +129,6 @@ export function WelcomeView() {
                       borderTop: `3px solid ${chip.accent}`,
                     }}
                     variants={fadeUp}
-                    custom={i}
                     whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(14,44,70,0.10)" }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ duration: 0.18 }}

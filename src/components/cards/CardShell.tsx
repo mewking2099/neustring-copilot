@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { springSmooth } from "@/lib/animations"
 
 export interface ChipDef {
   label: string
@@ -42,7 +43,7 @@ export function CardShell({ title, subtitle, children, chips, onChip, className 
               className="rounded-full border border-[#d0d5dd] bg-white px-3 py-1 text-xs text-[#344054] hover:border-[#0e2c46] hover:text-[#0e2c46] transition-colors"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              transition={springSmooth}
             >
               {c.label} <span aria-hidden="true">↗</span>
             </motion.button>

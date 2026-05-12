@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { Copy, ThumbsUp, ThumbsDown, RotateCcw, ChevronRight } from "lucide-react"
-import { motion } from "framer-motion"
-import yaanaIcon from "@/assets/yaana-icon.svg"
-import type { Variants } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
+import { YaanaAvatar } from "@/components/chat/YaanaAvatar"
 import type { Message, ContractChoice } from "@/store/chat"
 import { CARD_REGISTRY } from "@/components/cards"
 
@@ -127,9 +126,7 @@ export function MessageBubble({ message, onContractSelect, onChip }: Props) {
       initial="hidden"
       animate="show"
     >
-      <div className="w-7 h-7 rounded-full bg-[#0e2c46] flex items-center justify-center flex-shrink-0 self-start mt-2.5">
-        <img src={yaanaIcon} alt="Yaana" className="w-4 h-4 object-contain" />
-      </div>
+      <YaanaAvatar className="self-start mt-2.5" />
       <div className="flex-1 min-w-0">
         <div className="bg-[#f2f4f7] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#182230] leading-relaxed max-w-[85%]">
           {message.text}

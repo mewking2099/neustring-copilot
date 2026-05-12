@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { springSnappy } from "@/lib/animations"
 import yaanaIcon from "@/assets/yaana-icon.svg"
 import { useAppStore } from "@/store/app"
 import {
@@ -23,7 +24,6 @@ const RAIL_ITEMS = [
   { id: "rodeo",      icon: Activity,        label: "RoDeO" },
 ]
 
-const iconSpring = { type: "spring" as const, stiffness: 400, damping: 17 }
 
 export function Rail() {
   const { navOpen, toggleNav, activeRailItem, setActiveRailItem } = useAppStore()
@@ -51,7 +51,7 @@ export function Rail() {
         style={!navOpen ? { backgroundColor: "rgba(173,210,79,0.18)" } : undefined}
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.88 }}
-        transition={iconSpring}
+        transition={springSnappy}
       >
         {navOpen
           ? <PanelLeftClose className="w-4 h-4" />
@@ -76,7 +76,7 @@ export function Rail() {
             )}
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.88 }}
-            transition={iconSpring}
+            transition={springSnappy}
           >
             <Icon className="w-4 h-4" />
           </motion.button>
@@ -93,7 +93,7 @@ export function Rail() {
         className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors"
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.88 }}
-        transition={iconSpring}
+        transition={springSnappy}
       >
         <Info className="w-4 h-4" />
       </motion.button>
