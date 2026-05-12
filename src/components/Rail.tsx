@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import yaanaIcon from "@/assets/yaana-icon.svg"
 import { useAppStore } from "@/store/app"
@@ -22,6 +23,8 @@ const RAIL_ITEMS = [
   { id: "rodeo",      icon: Activity,        label: "RoDeO" },
 ]
 
+const iconSpring = { type: "spring" as const, stiffness: 400, damping: 17 }
+
 export function Rail() {
   const { navOpen, toggleNav, activeRailItem, setActiveRailItem } = useAppStore()
 
@@ -33,7 +36,7 @@ export function Rail() {
       </div>
 
       {/* Sidebar toggle */}
-      <button
+      <motion.button
         onClick={toggleNav}
         aria-label={navOpen ? "Collapse sidebar" : "Expand sidebar"}
         aria-expanded={navOpen}
@@ -46,45 +49,54 @@ export function Rail() {
             : "text-[#ADD24F] hover:text-white hover:bg-white/10"
         )}
         style={!navOpen ? { backgroundColor: "rgba(173,210,79,0.18)" } : undefined}
+        whileHover={{ scale: 1.12 }}
+        whileTap={{ scale: 0.88 }}
+        transition={iconSpring}
       >
         {navOpen
           ? <PanelLeftClose className="w-4 h-4" />
           : <PanelLeftOpen className="w-4 h-4" />
         }
-      </button>
+      </motion.button>
 
       {/* Nav icons */}
       <nav aria-label="Main navigation" className="flex flex-col items-center gap-1">
-      {RAIL_ITEMS.map(({ id, icon: Icon, label }) => (
-        <button
-          key={id}
-          aria-label={label}
-          aria-pressed={activeRailItem === id}
-          title={label}
-          onClick={() => setActiveRailItem(id)}
-          className={cn(
-            "w-8 h-8 flex items-center justify-center rounded-lg transition-colors",
-            activeRailItem === id
-              ? "bg-white/10 text-white"
-              : "text-white/60 hover:bg-white/10 hover:text-white"
-          )}
-        >
-          <Icon className="w-4 h-4" />
-        </button>
-      ))}
+        {RAIL_ITEMS.map(({ id, icon: Icon, label }) => (
+          <motion.button
+            key={id}
+            aria-label={label}
+            aria-pressed={activeRailItem === id}
+            title={label}
+            onClick={() => setActiveRailItem(id)}
+            className={cn(
+              "w-8 h-8 flex items-center justify-center rounded-lg transition-colors",
+              activeRailItem === id
+                ? "bg-white/10 text-white"
+                : "text-white/60 hover:bg-white/10 hover:text-white"
+            )}
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.88 }}
+            transition={iconSpring}
+          >
+            <Icon className="w-4 h-4" />
+          </motion.button>
+        ))}
       </nav>
 
       {/* Spacer */}
       <div className="flex-1" />
 
       {/* Info */}
-      <button
+      <motion.button
         aria-label="Help"
         title="Help"
         className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+        whileHover={{ scale: 1.12 }}
+        whileTap={{ scale: 0.88 }}
+        transition={iconSpring}
       >
         <Info className="w-4 h-4" />
-      </button>
+      </motion.button>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ChevronRight, Pin, PinOff } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useAppStore } from "@/store/app"
 import { DEMO_FLOWS, isActionFlow } from "@/data/flows"
@@ -107,8 +108,15 @@ function ActionItem({ flow }: { flow: ActionFlow }) {
       </div>
 
       {/* Sub-actions */}
-      {expanded && (
-        <div className="mb-1 space-y-0.5">
+      <AnimatePresence>
+        {expanded && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="overflow-hidden mb-1 space-y-0.5"
+        >
           {(flow.subActions ?? []).map((sub) => {
             const subPinned = isPinned(sub.id)
             return (
@@ -138,8 +146,9 @@ function ActionItem({ flow }: { flow: ActionFlow }) {
               </div>
             )
           })}
-        </div>
-      )}
+        </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -1,5 +1,8 @@
 import { useState } from "react"
 import { Copy, ThumbsUp, ThumbsDown, RotateCcw, ChevronRight } from "lucide-react"
+import { motion } from "framer-motion"
+import yaanaIcon from "@/assets/yaana-icon.svg"
+import type { Variants } from "framer-motion"
 import type { Message, ContractChoice } from "@/store/chat"
 import { CARD_REGISTRY } from "@/components/cards"
 
@@ -7,6 +10,11 @@ interface Props {
   message: Message
   onContractSelect?: (choice: ContractChoice) => void
   onChip?: (flowId: string) => void
+}
+
+const bubbleVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
 }
 
 function ContractChoiceList({
@@ -66,22 +74,13 @@ function MessageActions({ onCopy }: { onCopy: () => void }) {
           <Copy className="w-3.5 h-3.5" aria-hidden="true" />
         )}
       </button>
-      <button
-        aria-label="Mark as helpful"
-        className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors"
-      >
+      <button aria-label="Mark as helpful" className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors">
         <ThumbsUp className="w-3.5 h-3.5" aria-hidden="true" />
       </button>
-      <button
-        aria-label="Mark as not helpful"
-        className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors"
-      >
+      <button aria-label="Mark as not helpful" className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors">
         <ThumbsDown className="w-3.5 h-3.5" aria-hidden="true" />
       </button>
-      <button
-        aria-label="Regenerate response"
-        className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors"
-      >
+      <button aria-label="Regenerate response" className="w-7 h-7 flex items-center justify-center rounded-lg text-[#98a2b3] hover:text-[#0e2c46] hover:bg-[#f2f4f7] transition-colors">
         <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
       </button>
     </div>
@@ -91,13 +90,16 @@ function MessageActions({ onCopy }: { onCopy: () => void }) {
 export function MessageBubble({ message, onContractSelect, onChip }: Props) {
   if (message.kind === "divider") {
     return (
-      <div className="flex items-center gap-3 px-4 py-4">
+      <motion.div
+        className="flex items-center gap-3 px-4 py-4"
+        variants={bubbleVariants}
+        initial="hidden"
+        animate="show"
+      >
         <div className="flex-1 h-px bg-[#e4e7ec]" />
-        <span className="text-xs text-[#98a2b3] font-medium whitespace-nowrap select-none">
-          {message.label}
-        </span>
+        <span className="text-xs text-[#98a2b3] font-medium whitespace-nowrap select-none">{message.label}</span>
         <div className="flex-1 h-px bg-[#e4e7ec]" />
-      </div>
+      </motion.div>
     )
   }
 
@@ -105,18 +107,28 @@ export function MessageBubble({ message, onContractSelect, onChip }: Props) {
 
   if (isUser) {
     return (
-      <div className="flex justify-end px-4 py-2">
+      <motion.div
+        className="flex justify-end px-4 py-2"
+        variants={bubbleVariants}
+        initial="hidden"
+        animate="show"
+      >
         <div className="max-w-[72%] bg-[#0e2c46] text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
           {message.text}
         </div>
-      </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="group flex items-start gap-2 px-4 py-2">
-      <div className="w-7 h-7 rounded-full bg-[#0e2c46] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
-        N
+    <motion.div
+      className="group flex items-start gap-2 px-4 py-2"
+      variants={bubbleVariants}
+      initial="hidden"
+      animate="show"
+    >
+      <div className="w-7 h-7 rounded-full bg-[#0e2c46] flex items-center justify-center flex-shrink-0 self-start mt-2.5">
+        <img src={yaanaIcon} alt="Yaana" className="w-4 h-4 object-contain" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="bg-[#f2f4f7] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#182230] leading-relaxed max-w-[85%]">
@@ -124,16 +136,13 @@ export function MessageBubble({ message, onContractSelect, onChip }: Props) {
           {message.contractChoices && message.contractChoices.length > 0 && (
             <ContractChoiceList choices={message.contractChoices} onSelect={onContractSelect} />
           )}
-          {/* card slot */}
           {message.card && (() => {
             const CardComponent = CARD_REGISTRY[message.card!]
             return CardComponent ? <CardComponent onChip={onChip} /> : null
           })()}
         </div>
-        <MessageActions
-          onCopy={() => navigator.clipboard.writeText(message.text ?? "")}
-        />
+        <MessageActions onCopy={() => navigator.clipboard.writeText(message.text ?? "")} />
       </div>
-    </div>
+    </motion.div>
   )
 }
