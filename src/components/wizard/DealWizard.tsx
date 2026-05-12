@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { StepSlide } from "@/components/wizard/StepSlide"
 import { DEAL_STEP_LABELS } from "@/data/dealConv"
@@ -221,7 +220,6 @@ function Step6() {
 
 // ── Step 7 — Success ─────────────────────────────────────────────────────────
 function Step7({ onReset }: { onReset: () => void }) {
-  const navigate = useNavigate()
   return (
     <div className="flex flex-col items-center text-center py-6 gap-4">
       <div className="w-14 h-14 rounded-full bg-[#e8f2ce] flex items-center justify-center text-2xl">
@@ -233,7 +231,7 @@ function Step7({ onReset }: { onReset: () => void }) {
       </div>
       <div className="flex gap-3 mt-2">
         <button
-          onClick={() => navigate("/chat")}
+          onClick={() => window.open('/deal-summary.html', '_blank')}
           className="rounded-lg bg-[#0e2c46] text-white text-sm px-4 py-2 hover:bg-[#185992] transition-colors"
         >
           View deal #29107
