@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent } from "react"
+import { useState, type KeyboardEvent } from "react"
 import type { RoamingChannel, AccessLevel } from "@/domain/deal/types"
 import { ROAMING_CHANNEL_LABELS } from "@/domain/deal/discountFamilies"
 import { getRecentPartners } from "@/data/wizardProvenance"

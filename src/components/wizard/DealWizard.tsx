@@ -64,9 +64,6 @@ const RATE_UNIT: Record<RateKey, string> = {
 
 const HIGH_BLAST: RateKey[] = ["data"]
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10)
-}
 
 function addMonths(isoDate: string, months: number): string {
   const d = new Date(isoDate)

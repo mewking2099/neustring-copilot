@@ -29,11 +29,12 @@ const MODEL_FAMILY_LABELS: Record<string, string> = {
 const MODEL_FAMILIES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
 
 function encodeModel(m: DiscountModel): string {
-  if ('variant' in m)       return `${m.family}:${m.variant}`
-  if ('method' in m)        return `${m.family}:${m.method}`
-  if ('distribution' in m)  return `${m.family}:${m.distribution}`
-  if ('subtype' in m)       return `${m.family}:${m.subtype}`
-  return m.family
+  const { family } = m
+  if ('variant' in m)       return `${family}:${m.variant}`
+  if ('method' in m)        return `${family}:${m.method}`
+  if ('distribution' in m)  return `${family}:${m.distribution}`
+  if ('subtype' in m)       return `${family}:${m.subtype}`
+  return family
 }
 
 function decodeModel(key: string): DiscountModel {
@@ -185,7 +186,6 @@ export function StatementRow({ statementId, onOpenSettings, isPairedHalf = false
   const updateStatement    = useDealStore((s) => s.updateStatement)
   const duplicateStatement = useDealStore((s) => s.duplicateStatement)
   const deleteStatement    = useDealStore((s) => s.deleteStatement)
-  const addPairedStatement = useDealStore((s) => s.addPairedStatement)
   const linkStatements     = useDealStore((s) => s.linkStatements)
 
   if (!statement) return null
@@ -218,10 +218,6 @@ export function StatementRow({ statementId, onOpenSettings, isPairedHalf = false
   function updateBand(patch: Partial<typeof band>) {
     updateStatement(statementId, { bands: [{ ...band, ...patch }] })
   }
-
-  const discountDisplay = band.discount != null
-    ? `${band.discount}${band.discountUnit === 'percentage' ? '%' : band.discountUnit === 'fixed' ? ' fixed' : ' vol'}`
-    : '—'
 
   return (
     <div className="bg-white rounded-xl border border-[#e4e7ec] shadow-sm">

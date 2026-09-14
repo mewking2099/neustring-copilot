@@ -19,11 +19,12 @@ interface Props {
 
 // ── encode/decode model key (same logic as StatementRow) ─────────────────────
 function encodeModel(m: DiscountModel): string {
-  if ('variant' in m)       return `${m.family}:${m.variant}`
-  if ('method' in m)        return `${m.family}:${m.method}`
-  if ('distribution' in m)  return `${m.family}:${m.distribution}`
-  if ('subtype' in m)       return `${m.family}:${m.subtype}`
-  return m.family
+  const { family } = m
+  if ('variant' in m)       return `${family}:${m.variant}`
+  if ('method' in m)        return `${family}:${m.method}`
+  if ('distribution' in m)  return `${family}:${m.distribution}`
+  if ('subtype' in m)       return `${family}:${m.subtype}`
+  return family
 }
 
 function decodeModel(key: string): DiscountModel {
@@ -48,10 +49,6 @@ const MODEL_FAMILY_LABELS: Record<string, string> = {
   F: 'Family F — Access Fee / IMSI',
 }
 const MODEL_FAMILIES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
-
-const ALL_SERVICE_TYPES: ServiceType[] = [
-  'voice_mo', 'voice_mt', 'video_mt', 'sms', 'gprs', 'volte', 'nb_iot', 'lte_m', '5g',
-]
 
 // ── RateRow — compact in/out rate display ─────────────────────────────────────
 function RateRow({
@@ -189,7 +186,7 @@ export function PairedStatementRow({ inboundId, outboundId, onOpenSettings, coll
   }
 
   function handleApplyToChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    updateStatement(inboundId, { applyTo: e.target.value as typeof inbound.applyTo })
+    updateStatement(inboundId, { applyTo: e.target.value as typeof inbound!.applyTo })
   }
 
   function handleDeletePair() {
