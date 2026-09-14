@@ -1,6 +1,6 @@
 import { Settings, Unlink, Trash2, ChevronDown } from 'lucide-react'
 import { useDealStore } from '@/store/deal'
-import type { DiscountModel, ServiceType, RoamingChannel } from '@/domain/deal/types'
+import type { DiscountModel, ServiceType, RoamingChannel, ApplyTo } from '@/domain/deal/types'
 import {
   MODEL_OPTIONS,
   SERVICE_TYPE_LABELS,
@@ -186,7 +186,7 @@ export function PairedStatementRow({ inboundId, outboundId, onOpenSettings, coll
   }
 
   function handleApplyToChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    updateStatement(inboundId, { applyTo: e.target.value as typeof inbound!.applyTo })
+    updateStatement(inboundId, { applyTo: e.target.value as ApplyTo })
   }
 
   function handleDeletePair() {
