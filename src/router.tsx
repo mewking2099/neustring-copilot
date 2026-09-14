@@ -2,7 +2,9 @@ import { createBrowserRouter } from "react-router-dom"
 import { RootLayout } from "@/layouts/RootLayout"
 import { WelcomeView } from "@/views/WelcomeView"
 import ChatView from "@/views/ChatView"
+import { DealEntryView } from "@/views/DealEntryView"
 import { DealWizardView } from "@/views/DealWizardView"
+import { DealPageView } from "@/views/DealPageView"
 import { ContractCreateView } from "@/views/ContractCreateView"
 import { ContractFromDealView } from "@/views/ContractFromDealView"
 import { ContractEditView } from "@/views/ContractEditView"
@@ -15,7 +17,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <WelcomeView /> },
       { path: "chat", element: <ChatView /> },
+      { path: "deal/entry", element: <DealEntryView /> },
       { path: "deal/new", element: <DealWizardView /> },
+      { path: "deal/:id", element: <DealPageView /> },
       { path: "contract/new", element: <ContractCreateView /> },
       { path: "contract/from-deal", element: <ContractFromDealView /> },
       { path: "contract/:id/edit", element: <ContractEditView /> },

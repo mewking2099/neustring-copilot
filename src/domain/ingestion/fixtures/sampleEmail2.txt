@@ -1,0 +1,23 @@
+From: commercial@fraf1-mobile.com
+To: iris@neustring.com
+Subject: IOT Deal Proposal - BELMO/FRAF1
+
+Hi,
+
+Proposing the following M2M IOT deal for your review:
+
+My Networks: BELMO, ESPX1
+Roaming Partners: FRAF1
+Period: 2025-06 to 2026-05
+Currency: USD
+Channel: M2M
+
+Services proposed:
+- GPRS (M2M): Access Fee model
+- NB-IoT: Access Fee model
+- LTE-M: Threshold model
+
+Access level: Company
+
+Best,
+Alex Moreau

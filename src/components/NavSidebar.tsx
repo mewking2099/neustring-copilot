@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ChevronLeft, Plus } from "lucide-react"
+import irisLogo from "@/assets/iris-logo.svg"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { springSnappy, springSmooth } from "@/lib/animations"
@@ -37,7 +38,7 @@ export function NavSidebar() {
         <div className="shrink-0 px-3 pt-3 pb-2 space-y-2">
           {/* Title + collapse */}
           <div className="flex items-center justify-between h-8">
-            <span className="text-sm font-semibold text-[#0e2c46]">Co Pilot</span>
+            <img src={irisLogo} alt="Iris" className="h-6 object-contain select-none" />
             <motion.button
               onClick={() => setNavOpen(false)}
               aria-label="Collapse sidebar"

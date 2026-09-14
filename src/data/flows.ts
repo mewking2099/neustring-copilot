@@ -67,7 +67,7 @@ export const DEMO_FLOWS: DemoFlow[] = [
     id: "action-deals", category: "Functions", icon: Zap, name: "Deals",
     description: "Manage roaming deal agreements",
     subActions: [
-      { id: "deal-create",    label: "Create",    route: "/deal/new",  icon: Zap      },
+      { id: "deal-create",    label: "Create",    route: "/deal/entry",  icon: Zap      },
       { id: "deal-edit",      label: "Edit",      route: "/chat",      icon: Pencil   },
       { id: "deal-duplicate", label: "Duplicate", route: "/chat",      icon: Copy     },
       { id: "deal-review",    label: "Review",    route: "/chat",      icon: Eye      },
@@ -116,7 +116,7 @@ export const FLOW_LABELS: Record<string, string> = Object.fromEntries(
 )
 
 export const DEFAULT_PINS: PinnedItem[] = [
-  { id: "deal-create", name: "Create Deal",      icon: Zap,          route: "/deal/new" },
+  { id: "deal-create", name: "Create Deal",      icon: Zap,          route: "/deal/entry" },
   { id: "traffic",     name: "Traffic Patterns", icon: Radio,        route: "/chat", flowId: "traffic"   },
   { id: "tasks",       name: "Priority Tasks",   icon: ListChecks,   route: "/chat", flowId: "tasks"     },
   { id: "approvals",   name: "Deal Approvals",   icon: ClipboardCheck, route: "/chat", flowId: "approvals" },

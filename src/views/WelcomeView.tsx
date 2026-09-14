@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import neuStringLogo from "@/assets/NeuString-logo.svg"
+import irisLogo from "@/assets/iris-logo.svg"
 import { useNavigate } from "react-router-dom"
 import { X } from "lucide-react"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
@@ -84,8 +84,8 @@ export function WelcomeView() {
         >
           {/* Logo */}
           <motion.img
-            src={neuStringLogo}
-            alt="NeuString"
+            src={irisLogo}
+            alt="Iris"
             className="h-10 object-contain mb-8 select-none"
             variants={fadeUp}
           />

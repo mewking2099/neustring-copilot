@@ -1,7 +1,6 @@
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { springSnappy } from "@/lib/animations"
-import yaanaIcon from "@/assets/yaana-icon.svg"
 import { useAppStore } from "@/store/app"
 import {
   LayoutDashboard, MessageSquare, TrendingUp, DollarSign,
@@ -30,9 +29,14 @@ export function Rail() {
 
   return (
     <div className="w-12 flex flex-col items-center bg-[#0e2c46] py-3 gap-1 shrink-0 h-full">
-      {/* Logo */}
+      {/* Iris sparkle mark */}
       <div className="w-8 h-8 flex items-center justify-center mb-1">
-        <img src={yaanaIcon} alt="Yaana" className="w-7 h-7 object-contain" />
+        <svg viewBox="200 8 44 46" className="w-5 h-5" fill="none" aria-label="Iris">
+          <path
+            d="M223.534 8.65137C225.724 13.3577 226.427 21.1527 228.865 27.1218C232.625 28.0506 240.716 29.6783 243.674 31.5816C241.757 33.5308 231.641 35.5591 228.269 36.3829C226.831 40.8677 225.253 48.5019 224.121 53.3224L223.633 53.349C222.36 52.247 219.625 39.2692 218.873 36.3346C213.253 34.6803 206.195 33.1251 200.418 31.6841C206.691 30.223 212.947 28.7012 219.195 27.1193C220.823 21.3976 221.914 14.7221 223.534 8.65137Z"
+            fill="#ADD24F"
+          />
+        </svg>
       </div>
 
       {/* Sidebar toggle */}

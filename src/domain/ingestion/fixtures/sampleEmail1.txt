@@ -1,0 +1,24 @@
+From: negotiation@grax-telecom.com
+To: iris@neustring.com
+Subject: Roaming Agreement Proposal - ARAX1/GRAX1 2025
+
+Dear Team,
+
+Please find below the proposed terms for our bilateral roaming agreement:
+
+My Networks: ARAX1, ARAX2
+Roaming Partners: GRAX1, GRAX3
+Agreement Period: 2025-01 to 2025-12
+Currency: EUR
+Auto-renewal: Yes (30 days notice)
+
+Services:
+- GPRS: Threshold model, 0-∞ volume, rate TBD
+- Voice MO: Threshold model, rate TBD
+- Voice MT: Commitment model, rate TBD
+- SMS: Threshold model, rate TBD
+
+Please review and confirm.
+
+Best regards,
+Christophe Demars
