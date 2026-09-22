@@ -8,6 +8,7 @@ import {
   getUsualDealType,
   getServiceFrequency,
   getRateSuggestion,
+  getInferredRateSuggestion,
   getSuggestedCurrency,
   getSuggestedTerm,
   getAutoRenewalSuggestion,
@@ -19,8 +20,9 @@ import type { HistoricalDeal } from "@/data/dealHistory"
 type RateKey = 'data' | 'voice' | 'sms' | 'iot'
 
 export interface WizardData {
-  partner: string | null
+  partner: string | null       // primary partner (first selected) — used for provenance lookups
   partnerName: string | null
+  partners: string[]           // all selected TADIGs
   dealType: string | null
   clonedFromId: string | null
   services: string[]
@@ -73,12 +75,31 @@ function addMonths(isoDate: string, months: number): string {
 
 function ProvenanceTag({ dealId, date }: { dealId: string; date: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#667085] bg-[#f2f4f7] rounded px-1.5 py-0.5 border border-[#e4e7ec]">
+    <span
+      title="Tier 1 — your direct deal history"
+      className="inline-flex items-center gap-1 text-[9px] font-medium text-[#667085] bg-[#f2f4f7] rounded px-1.5 py-0.5 border border-[#e4e7ec]"
+    >
       <svg className="w-2.5 h-2.5 text-[#82bc34]" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M6 1v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2" />
       </svg>
       {dealId} · {date}
+    </span>
+  )
+}
+
+function InferredTag({ fromName }: { fromName: string }) {
+  return (
+    <span
+      title="Tier 2 — inferred from a comparable partner; verify before accepting"
+      className="inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-50 rounded px-1.5 py-0.5 border border-amber-200"
+    >
+      <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M6 2L10 9H2L6 2Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+        <path d="M6 5.5v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="6" cy="8.5" r="0.5" fill="currentColor" />
+      </svg>
+      Similar to {fromName}
     </span>
   )
 }
@@ -99,8 +120,26 @@ function Zone1({
   const lastDeal: HistoricalDeal | null = data.partner ? getLastDeal(data.partner) : null
   const usualType = data.partner ? getUsualDealType(data.partner) : null
 
-  function selectPartner(tadig: string, name: string) {
-    onChange({ partner: tadig, partnerName: name, dealType: null, clonedFromId: null })
+  function togglePartner(tadig: string, name: string) {
+    const already = data.partners.includes(tadig)
+    if (already) {
+      const next = data.partners.filter((p) => p !== tadig)
+      onChange({
+        partners: next,
+        partner: next[0] ?? null,
+        partnerName: next.length ? (next[0] === data.partner ? data.partnerName : next[0]) : null,
+        dealType: null,
+        clonedFromId: null,
+      })
+    } else {
+      onChange({
+        partners: [...data.partners, tadig],
+        partner: data.partner ?? tadig,
+        partnerName: data.partnerName ?? name,
+        dealType: null,
+        clonedFromId: null,
+      })
+    }
   }
 
   function handleCustomSelect() {
@@ -111,7 +150,7 @@ function Zone1({
     }
     setCustomError("")
     setCustomInput("")
-    selectPartner(tadig, tadig)
+    togglePartner(tadig, tadig)
   }
 
   function cloneFromLast() {
@@ -127,6 +166,7 @@ function Zone1({
       userEditedRates: [],
       clonedFromId: lastDeal.id,
       dealType: lastDeal.dealType,
+      partners: data.partners.length ? data.partners : (data.partner ? [data.partner] : []),
     })
   }
 
@@ -137,14 +177,19 @@ function Zone1({
         <p className="text-xs font-semibold text-[#98a2b3] uppercase tracking-wider mb-3">
           Recent partners
         </p>
+        {data.partners.length > 1 && (
+          <p className="text-[11px] text-[#82bc34] font-semibold mb-2">
+            {data.partners.length} partners selected
+          </p>
+        )}
         <div className="grid grid-cols-2 gap-2.5">
           {partners.map((p) => {
-            const isSelected = data.partner === p.tadig
+            const isSelected = data.partners.includes(p.tadig)
             return (
               <button
                 key={p.tadig}
                 type="button"
-                onClick={() => selectPartner(p.tadig, p.name)}
+                onClick={() => togglePartner(p.tadig, p.name)}
                 className={cn(
                   "rounded-xl border px-4 py-3 text-left transition-all",
                   isSelected
@@ -208,9 +253,14 @@ function Zone1({
             Select
           </button>
         </div>
-        {data.partner && !partners.some(p => p.tadig === data.partner) && (
+        {data.partners.some((t) => !partners.some((p) => p.tadig === t)) && (
           <p className="text-[11px] text-[#667085] mt-2">
-            <span className="text-[#82bc34] font-semibold">✓</span> Custom partner <strong className="text-[#344054]">{data.partner}</strong> selected — no deal history available.
+            <span className="text-[#82bc34] font-semibold">✓</span>{" "}
+            Custom:{" "}
+            <strong className="text-[#344054]">
+              {data.partners.filter((t) => !partners.some((p) => p.tadig === t)).join(", ")}
+            </strong>{" "}
+            — no deal history available.
           </p>
         )}
       </div>
@@ -379,6 +429,7 @@ function Zone2({
           <div className="space-y-3">
             {ALL_SERVICES.filter((s) => data.services.includes(s.key)).map((s) => {
               const suggestion = data.partner ? getRateSuggestion(data.partner, s.rateKey) : null
+              const inferred = (!suggestion && data.partner) ? getInferredRateSuggestion(data.partner, s.rateKey) : null
               const rateVal = data.rates[s.rateKey] ?? ""
               const isHighBlast = HIGH_BLAST.includes(s.rateKey)
               const isAccepted = data.ratesAccepted.includes(s.rateKey)
@@ -391,6 +442,8 @@ function Zone2({
                     "rounded-xl border px-4 py-3 transition-colors",
                     isAccepted
                       ? "border-[#82bc34] bg-[#f6fbee]"
+                      : inferred
+                      ? "border-amber-200 bg-amber-50/40"
                       : isHighBlast
                       ? "border-[#d0d5dd] bg-white"
                       : "border-[#e4e7ec] bg-[#f9fafb]"
@@ -404,6 +457,9 @@ function Zone2({
                         </p>
                         {suggestion && !isEdited && (
                           <ProvenanceTag dealId={suggestion.sourceId} date={suggestion.sourceDate} />
+                        )}
+                        {inferred && !isEdited && (
+                          <InferredTag fromName={inferred.inferredFromName} />
                         )}
                         {isEdited && (
                           <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
@@ -426,6 +482,11 @@ function Zone2({
                       {suggestion && (
                         <p className="text-[10px] text-[#98a2b3] mt-1">
                           Last {suggestion.sampleSize}: €{suggestion.min.toFixed(3)}–€{suggestion.max.toFixed(3)} · avg €{suggestion.avg.toFixed(3)}
+                        </p>
+                      )}
+                      {inferred && (
+                        <p className="text-[10px] text-amber-600 mt-1">
+                          Comparable ({inferred.sampleSize} deals): €{inferred.min.toFixed(3)}–€{inferred.max.toFixed(3)} — verify before accepting
                         </p>
                       )}
                     </div>
@@ -629,7 +690,7 @@ function Zone4({
   }
 
   // Zone 1 fields
-  if (data.partner) add(true, "Partner", `${data.partnerName} (${data.partner})`, 1)
+  if (data.partners.length > 0) add(true, "Partner(s)", data.partners.join(", "), 1)
   if (data.dealType) add(true, "Deal type", data.dealType, 1)
   if (data.clonedFromId) add(true, "Cloned from", data.clonedFromId, 1)
 
@@ -735,7 +796,7 @@ const ZONE_SUBTITLES: Record<number, string> = {
 
 export function DealWizard({ step, data, onDataChange, onNext, onBack, onComplete, onGoToStep }: Props) {
   function canAdvance(): boolean {
-    if (step === 1) return !!data.partner && !!data.dealType
+    if (step === 1) return data.partners.length > 0 && !!data.dealType
     if (step === 2) return data.services.length > 0
     if (step === 3) return !!data.periodStart && !!data.periodEnd && data.termMonths > 0
     return true

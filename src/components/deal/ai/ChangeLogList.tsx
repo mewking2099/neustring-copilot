@@ -22,8 +22,15 @@ export function ChangeLogList() {
   return (
     <div className="px-4 pt-3 pb-2">
       <p className="text-xs font-semibold text-[#0e2c46] mb-2">
-        {aiChangeLog.length} change{aiChangeLog.length !== 1 ? 's' : ''}
+        {aiChangeLog.length > 0
+          ? `${aiChangeLog.length} change${aiChangeLog.length !== 1 ? 's' : ''}`
+          : 'Activity'}
       </p>
+      {aiChangeLog.length === 0 && (
+        <p className="text-[10px] text-[#98a2b3] pb-1 leading-relaxed">
+          Edits and AI actions will appear here as you build.
+        </p>
+      )}
       <div>
         {entries.map((entry) => (
           <div

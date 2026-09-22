@@ -4,6 +4,7 @@ import { Rail } from "@/components/Rail"
 import { NavSidebar } from "@/components/NavSidebar"
 import { Topbar } from "@/components/Topbar"
 import { useAppStore } from "@/store/app"
+import { QualifyingDrawer } from "@/components/deal/entry/QualifyingDrawer"
 
 export function RootLayout() {
   const { setNavOpen } = useAppStore()
@@ -32,6 +33,9 @@ export function RootLayout() {
           <Outlet />
         </div>
       </div>
+
+      {/* Global overlays */}
+      <QualifyingDrawer />
     </div>
   )
 }

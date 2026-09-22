@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { ChevronUp, ChevronDown, Upload } from 'lucide-react'
+import { ChevronUp, ChevronDown, Upload, Plus } from 'lucide-react'
 import { useDealStore } from '@/store/deal'
+import { useDealStore as useDealShell } from '@/store/deal'
 import { StatementTabs } from './StatementTabs'
 import type { StatementFilter } from './StatementTabs'
 import { StatementRow } from './StatementRow'
 import { PairedStatementRow } from './PairedStatementRow'
 import { StatementEmptyState } from './StatementEmptyState'
 import { StatementImportModal } from './StatementImportModal'
+import { OverrideInlinePicker } from './OverrideInlinePicker'
+import type { Statement } from '@/domain/deal/types'
 
 interface Props {
   onOpenSettings: (id: string) => void
@@ -16,45 +19,131 @@ type DisplayRow =
   | { type: 'paired'; inboundId: string; outboundId: string }
   | { type: 'single'; id: string; isPaired: boolean }
 
-function buildDisplayRows(
-  allStatements: ReturnType<typeof useDealStore.getState>['statements'],
+type Layer1Group = {
+  mainRow: DisplayRow
+  key: string
+  representativeId: string  // inbound id for pairs, statement id for singles
+  overrideRows: DisplayRow[]
+}
+
+function buildLayer1Groups(
+  allStatements: Statement[],
   filter: StatementFilter,
-): DisplayRow[] {
-  const linkedIds = new Set(
-    allStatements.filter((s) => s.linkedStatementId).map((s) => s.id),
-  )
+): Layer1Group[] {
+  const layer1 = allStatements.filter((s) => !s.layer || s.layer === 1)
+  const layer2 = allStatements.filter((s) => s.layer === 2)
 
-  const source =
-    filter === 'all'
-      ? allStatements
-      : allStatements.filter((st) => st.direction === filter)
-
-  if (filter !== 'all') {
-    return source.map((st) => ({ type: 'single', id: st.id, isPaired: linkedIds.has(st.id) }))
+  // Build a map of parentStatementId → Layer 2 statements
+  const overridesByParent = new Map<string, Statement[]>()
+  for (const s of layer2) {
+    const key = s.parentStatementId ?? '__orphan__'
+    if (!overridesByParent.has(key)) overridesByParent.set(key, [])
+    overridesByParent.get(key)!.push(s)
   }
 
-  // 'all' view — collapse linked pairs into a single paired row
-  const processed = new Set<string>()
-  const rows: DisplayRow[] = []
+  const source = filter === 'all' ? layer1 : layer1.filter((s) => s.direction === filter)
 
-  for (const st of allStatements) {
+  // For filtered views, flatten to single rows (no grouping)
+  if (filter !== 'all') {
+    return source.map((st) => {
+      const overrides = overridesByParent.get(st.id) ?? []
+      return {
+        mainRow: { type: 'single', id: st.id, isPaired: !!st.linkedStatementId },
+        key: st.id,
+        representativeId: st.id,
+        overrideRows: overrides.map((o) => ({ type: 'single' as const, id: o.id, isPaired: !!o.linkedStatementId })),
+      }
+    })
+  }
+
+  // 'all' view — collapse linked Layer 1 pairs into paired rows
+  const processed = new Set<string>()
+  const groups: Layer1Group[] = []
+
+  for (const st of layer1) {
     if (processed.has(st.id)) continue
+
     if (st.linkedStatementId) {
-      const linked = allStatements.find((s) => s.id === st.linkedStatementId)
+      const linked = layer1.find((s) => s.id === st.linkedStatementId)
       if (linked && !processed.has(linked.id)) {
         const inbound  = st.direction === 'inbound'  ? st : linked
         const outbound = st.direction === 'outbound' ? st : linked
-        rows.push({ type: 'paired', inboundId: inbound.id, outboundId: outbound.id })
+        const key = `${inbound.id}:${outbound.id}`
+
+        // Layer 2 overrides keyed by the inbound parent id
+        const ovStmts = overridesByParent.get(inbound.id) ?? []
+        const ovProcessed = new Set<string>()
+        const ovRows: DisplayRow[] = []
+        for (const ov of ovStmts) {
+          if (ovProcessed.has(ov.id)) continue
+          if (ov.linkedStatementId) {
+            const ovLinked = layer2.find((s) => s.id === ov.linkedStatementId)
+            if (ovLinked && !ovProcessed.has(ovLinked.id)) {
+              const ovIn  = ov.direction === 'inbound'  ? ov : ovLinked
+              const ovOut = ov.direction === 'outbound' ? ov : ovLinked
+              ovRows.push({ type: 'paired', inboundId: ovIn.id, outboundId: ovOut.id })
+              ovProcessed.add(ov.id)
+              ovProcessed.add(ovLinked.id)
+              continue
+            }
+          }
+          ovRows.push({ type: 'single', id: ov.id, isPaired: false })
+          ovProcessed.add(ov.id)
+        }
+
+        groups.push({
+          mainRow: { type: 'paired', inboundId: inbound.id, outboundId: outbound.id },
+          key,
+          representativeId: inbound.id,
+          overrideRows: ovRows,
+        })
         processed.add(st.id)
         processed.add(linked.id)
         continue
       }
     }
-    rows.push({ type: 'single', id: st.id, isPaired: false })
+
+    const ovStmts = overridesByParent.get(st.id) ?? []
+    groups.push({
+      mainRow: { type: 'single', id: st.id, isPaired: false },
+      key: st.id,
+      representativeId: st.id,
+      overrideRows: ovStmts.map((o) => ({
+        type: 'single' as const,
+        id: o.id,
+        isPaired: !!o.linkedStatementId,
+      })),
+    })
     processed.add(st.id)
   }
 
-  return rows
+  return groups
+}
+
+function renderRow(
+  row: DisplayRow,
+  onOpenSettings: (id: string) => void,
+  collapsed: boolean,
+  onToggleCollapse: () => void,
+) {
+  if (row.type === 'paired') {
+    return (
+      <PairedStatementRow
+        inboundId={row.inboundId}
+        outboundId={row.outboundId}
+        onOpenSettings={onOpenSettings}
+        collapsed={collapsed}
+        onToggleCollapse={onToggleCollapse}
+      />
+    )
+  }
+  return (
+    <StatementRow
+      statementId={row.id}
+      isPairedHalf={row.isPaired}
+      onOpenSettings={onOpenSettings}
+    />
+  )
 }
 
 export function StatementSection({ onOpenSettings }: Props) {
@@ -62,6 +151,7 @@ export function StatementSection({ onOpenSettings }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [collapsedPairs, setCollapsedPairs] = useState<Set<string>>(() => new Set())
+  const [pickerOpenFor, setPickerOpenFor] = useState<string | null>(null)
 
   function togglePairCollapsed(key: string) {
     setCollapsedPairs((prev) => {
@@ -73,11 +163,15 @@ export function StatementSection({ onOpenSettings }: Props) {
   }
 
   const allStatements      = useDealStore((s) => s.statements)
+  const shell              = useDealShell((s) => s.shell)
   const addStatement       = useDealStore((s) => s.addStatement)
   const addPairedStatement = useDealStore((s) => s.addPairedStatement)
+  const addOverrideStatement = useDealStore((s) => s.addOverrideStatement)
 
-  const displayRows = buildDisplayRows(allStatements, filter)
-  const isEmpty = displayRows.length === 0
+  const availablePartners = shell?.roamingPartners ?? []
+  const layer1Count = allStatements.filter((s) => !s.layer || s.layer === 1).length
+  const groups = buildLayer1Groups(allStatements, filter)
+  const isEmpty = layer1Count === 0
 
   return (
     <>
@@ -126,32 +220,69 @@ export function StatementSection({ onOpenSettings }: Props) {
                 <StatementEmptyState direction={filter === 'all' ? 'inbound' : filter} />
               ) : (
                 <>
-                  {displayRows.map((row) => {
-                    if (row.type === 'paired') {
-                      const pairKey = `${row.inboundId}:${row.outboundId}`
-                      return (
-                        <div key={pairKey} className="ml-4">
-                          <PairedStatementRow
-                            inboundId={row.inboundId}
-                            outboundId={row.outboundId}
-                            onOpenSettings={onOpenSettings}
-                            collapsed={collapsedPairs.has(pairKey)}
-                            onToggleCollapse={() => togglePairCollapsed(pairKey)}
-                          />
-                        </div>
-                      )
-                    }
-                    return (
-                      <StatementRow
-                        key={row.id}
-                        statementId={row.id}
-                        isPairedHalf={row.isPaired}
-                        onOpenSettings={onOpenSettings}
-                      />
-                    )
-                  })}
+                  {groups.map((group) => (
+                    <div key={group.key} className="flex flex-col gap-1.5">
+                      {/* Layer 1 main row */}
+                      <div className={group.mainRow.type === 'paired' ? 'ml-4' : ''}>
+                        {renderRow(
+                          group.mainRow,
+                          onOpenSettings,
+                          collapsedPairs.has(group.key),
+                          () => togglePairCollapsed(group.key),
+                        )}
+                      </div>
 
-                  {/* Terminal add-slot */}
+                      {/* Layer 2 override rows — indented with left accent */}
+                      {group.overrideRows.length > 0 && (
+                        <div className="ml-6 flex flex-col gap-1.5 border-l-2 border-[#0e2c46]/20 pl-3">
+                          {group.overrideRows.map((ovRow) => {
+                            const ovKey = ovRow.type === 'paired'
+                              ? `${ovRow.inboundId}:${ovRow.outboundId}`
+                              : ovRow.id
+                            return (
+                              <div key={ovKey} className={ovRow.type === 'paired' ? 'ml-4' : ''}>
+                                {renderRow(
+                                  ovRow,
+                                  onOpenSettings,
+                                  collapsedPairs.has(ovKey),
+                                  () => togglePairCollapsed(ovKey),
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      {/* + Add partner override affordance */}
+                      {(!group.mainRow.type || filter === 'all') && (
+                        <div className="ml-6">
+                          {pickerOpenFor === group.representativeId ? (
+                            <OverrideInlinePicker
+                              availablePartners={availablePartners}
+                              onConfirm={(partners) => {
+                                addOverrideStatement(group.representativeId, partners)
+                                setPickerOpenFor(null)
+                              }}
+                              onCancel={() => setPickerOpenFor(null)}
+                            />
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setPickerOpenFor(group.representativeId)}
+                              className="flex items-center gap-1.5 text-[11px] font-medium text-[#667085] hover:text-[#0e2c46] transition-colors py-0.5 group"
+                            >
+                              <span className="flex items-center justify-center w-4 h-4 rounded border border-dashed border-[#d0d5dd] group-hover:border-[#0e2c46] transition-colors">
+                                <Plus className="w-2.5 h-2.5" />
+                              </span>
+                              Add partner override
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Terminal add-slot for new Layer 1 statements */}
                   <div className="rounded-xl border border-dashed border-[#d0d5dd] bg-white px-4 py-3 flex items-center gap-3 flex-wrap">
                     <button
                       type="button"

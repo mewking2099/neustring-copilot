@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ArrowLeftRight, Settings, Copy, Trash2, Link } from 'lucide-react'
 import { useDealStore } from '@/store/deal'
+import { ScopeBadge } from './ScopeBadge'
+import { BandEditor } from './BandEditor'
 import type { DiscountModel, ServiceType, RoamingChannel } from '@/domain/deal/types'
 import {
   MODEL_OPTIONS,
@@ -258,6 +260,11 @@ export function StatementRow({ statementId, onOpenSettings, isPairedHalf = false
           </span>
         )}
 
+        {/* Scope badge — Layer 2 partner override */}
+        {statement.layer === 2 && statement.scopedPartners && (
+          <ScopeBadge partners={statement.scopedPartners} />
+        )}
+
         {/* Service pills — flex-1 */}
         <ServiceTypeSelect
           selected={serviceTypes}
@@ -307,8 +314,15 @@ export function StatementRow({ statementId, onOpenSettings, isPairedHalf = false
           </select>
         </div>
 
+        {/* Band count chip — shown when more than one volume band */}
+        {bands.length > 1 && (
+          <span className="text-[9px] font-semibold text-[#667085] bg-[#f2f4f7] rounded px-1.5 py-0.5 border border-[#e4e7ec] shrink-0">
+            {bands.length} bands
+          </span>
+        )}
+
         {/* Secondary indicator — shows non-default values when collapsed */}
-        {!expanded && (roamingChannel !== 'traditional' || applyTo !== 'threshold' || band.from != null || band.to != null) && (
+        {!expanded && (roamingChannel !== 'traditional' || applyTo !== 'threshold') && (
           <span className="text-[10px] text-[#667085] bg-[#f9fafb] rounded px-1.5 py-0.5 border border-[#e4e7ec] shrink-0">
             +details
           </span>
@@ -374,33 +388,12 @@ export function StatementRow({ statementId, onOpenSettings, isPairedHalf = false
             </select>
           </div>
 
-          {/* Band interval */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] text-[#98a2b3] font-medium uppercase tracking-wide">From</span>
-            <input
-              type="number"
-              value={band.from ?? ''}
-              onChange={(e) => updateBand({ from: e.target.value === '' ? null : Number(e.target.value) })}
-              className="w-16 text-center text-xs border border-[#e4e7ec] rounded-lg px-1 py-1.5 outline-none focus:border-[#82bc34] bg-white"
-              placeholder="0"
+          {/* Band editor — all volume/condition bands (Layer 3) */}
+          <div className="w-full">
+            <BandEditor
+              bands={bands}
+              onChange={(next) => updateStatement(statementId, { bands: next })}
             />
-            <span className="text-[#98a2b3] text-xs">–</span>
-            <input
-              type="number"
-              value={band.to ?? ''}
-              onChange={(e) => updateBand({ to: e.target.value === '' ? null : Number(e.target.value) })}
-              className="w-16 text-center text-xs border border-[#e4e7ec] rounded-lg px-1 py-1.5 outline-none focus:border-[#82bc34] bg-white"
-              placeholder="∞"
-            />
-            <select
-              value={band.unit}
-              onChange={(e) => updateBand({ unit: e.target.value as 'volume' | 'charge' | 'imsi' })}
-              className="text-xs border border-[#e4e7ec] rounded-lg px-2 py-1.5 bg-white text-[#344054] outline-none focus:border-[#82bc34]"
-            >
-              <option value="volume">Volume</option>
-              <option value="charge">Charge</option>
-              <option value="imsi">IMSI</option>
-            </select>
           </div>
 
           {/* Secondary actions */}

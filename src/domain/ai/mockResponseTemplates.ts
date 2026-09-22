@@ -1,28 +1,34 @@
-import type { DealState } from '@/domain/deal/types'
+import type { DealShell } from '@/domain/deal/types'
+import type { StatementCard } from '@/domain/deal/cardTypes'
 
 const EXPLAIN_RESPONSES: Record<string, string> = {
-  explainBUB: "Balanced/Unbalanced (B/UB) splits traffic into a 'balanced' portion — the smaller of inbound vs outbound — priced at a premium rate, and an 'unbalanced' surplus priced at a cheaper rate. It rewards mutual traffic exchange.",
-  explainThreshold: "Threshold is the base model: you define volume bands (e.g. 0–100k MB at one rate, 100k–∞ at a lower rate). Each band charges at its own rate unless you set Apply To = Retrospective, which back-prices all traffic at the reached tier.",
-  copyToOutbound: "Done — all inbound statements have been copied to outbound. Review the Outbound tab to adjust any direction-specific rates.",
-  addVoiceMT: "I've added a Voice MT statement to inbound. Set the threshold bands and model in the new row.",
-  addGPRS: "Added a GPRS statement. Select your roaming channel (M2M is common for GPRS) and configure the interval bands.",
-  addSMS: "Added an SMS statement. Threshold with a single 0–∞ band is the most common pattern for SMS.",
+  explainQualifying: "Statement cards are created automatically from your qualifying answers — each card defines a scope (My Network × Partner × Conditions) with service rows inside. Use the wizard's qualifying flow or start a deal and the canvas pre-fills for you.",
+  explainRates: "Enter discount percentages (e.g. 15 for 15%) in the Inbound and Outbound columns. Inbound = traffic from partner roamers on your network. Outbound = your subscribers roaming on the partner network. Blank rows won't be included in final terms.",
+  explainBUB: "Balanced/Unbalanced splits traffic: the balanced portion (the smaller of inbound vs outbound) is priced at a premium rate; the unbalanced surplus is cheaper. It rewards mutual traffic exchange between partners.",
+  explainOverride: "Partner overrides (Layer 2) let you set different rates for a specific partner when this deal covers multiple partners. Click '+ Add partner override' at the bottom of any global statement card.",
+  explainBilateral: "Bilateral pricing means both Inbound and Outbound traffic are priced in the same statement card. Enter rates in both columns — Inbound (blue) for partner roamers on your network, Outbound (orange) for your subscribers abroad.",
 }
 
-export function getMockResponse(handler: string, state: DealState): string {
+export function getMockResponse(
+  handler: string,
+  shell: DealShell | null,
+  cards: StatementCard[],
+): string {
   if (EXPLAIN_RESPONSES[handler]) return EXPLAIN_RESPONSES[handler]
-  const count = state.statements.length
-  const partner = state.shell?.roamingPartners[0] ?? 'your partner'
-  return `Got it. You now have ${count} statement${count !== 1 ? 's' : ''} with ${partner}. Keep building or use the quick actions.`
+  const count = cards.length
+  const partner = shell?.roamingPartners[0] ?? 'your partner'
+  return `Got it. You now have ${count} statement card${count !== 1 ? 's' : ''} with ${partner}. Keep building or ask me anything.`
 }
 
-export function getMockResponseFromText(text: string, state: DealState): string {
+export function getMockResponseFromText(
+  text: string,
+  shell: DealShell | null,
+  cards: StatementCard[],
+): string {
   const lower = text.toLowerCase()
-  if (lower.includes('balance') || lower.includes('b/ub')) {
-    return EXPLAIN_RESPONSES.explainBUB
-  }
-  if (lower.includes('threshold')) {
-    return EXPLAIN_RESPONSES.explainThreshold
-  }
-  return getMockResponse('generic', state)
+  if (lower.includes('balance') || lower.includes('b/ub')) return EXPLAIN_RESPONSES.explainBUB
+  if (lower.includes('threshold')) return EXPLAIN_RESPONSES.explainRates
+  if (lower.includes('override')) return EXPLAIN_RESPONSES.explainOverride
+  if (lower.includes('bilateral')) return EXPLAIN_RESPONSES.explainBilateral
+  return getMockResponse('generic', shell, cards)
 }

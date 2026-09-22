@@ -17,6 +17,8 @@ export const FLOW_TRIGGER_TEXT: Record<string, string> = {
   "contract-review":                "I'd like to review a contract",
   "contract-review-compare":        "Compare with another version",
   "contract-review-compare-result": "Analysis complete",
+  "deal":                           "Create a new deal",
+  "deal-clone-picker":              "Clone an existing deal",
 }
 
 export const AI_TEXT: Record<string, string> = {
@@ -37,6 +39,8 @@ export const AI_TEXT: Record<string, string> = {
   "contract-review-analyze":          "Here's the full analysis of your selected contract.",
   "contract-review-compare":          "Upload the contract version you'd like to compare. You can drop a file or I'll simulate the upload.",
   "contract-review-compare-result":   "Analysis complete. Here's the clause-by-clause comparison.",
+  "deal":                             "How would you like to create this deal?",
+  "deal-clone-picker":                "Select a deal to clone — I'll pre-fill everything from it.",
 }
 
 export const CONTRACT_CHOICES: ContractChoice[] = [

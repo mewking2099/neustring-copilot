@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils"
 interface Props {
   onSend: (text: string) => void
   disabled?: boolean
+  placeholder?: string
 }
 
-export function ChatInput({ onSend, disabled }: Props) {
+export function ChatInput({ onSend, disabled, placeholder = "Ask NeuString anything…" }: Props) {
   const [value, setValue] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const isSendingRef = useRef(false)
@@ -61,7 +62,7 @@ export function ChatInput({ onSend, disabled }: Props) {
           value={value}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder="Ask NeuString anything…"
+          placeholder={placeholder}
           rows={1}
           disabled={disabled}
           className={cn(

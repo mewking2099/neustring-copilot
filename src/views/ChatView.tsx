@@ -9,7 +9,7 @@ import { detectFlow } from "@/lib/intentRouter"
 import { FLOW_LABELS } from "@/data/flows"
 import type { ContractChoice } from "@/store/chat"
 
-const WIZARD_FLOWS = new Set(["contract-create", "contract-edit", "deal"])
+const WIZARD_FLOWS = new Set(["contract-create", "contract-edit"])
 
 export default function ChatView() {
   const { messages, isTyping, addMessage, setIsTyping } = useChatStore()
@@ -57,10 +57,12 @@ export default function ChatView() {
     if (WIZARD_FLOWS.has(flowId)) {
       addMessage({ role: "user", text })
       triggerFlow(flowId)
-    } else if (flowId === "contract-review") {
-      triggerFlow(flowId)
-    } else {
+    } else if (flowId === "traffic") {
       sendUserMessage(text)
+    } else {
+      // All other recognised flows (deal, tasks, forecast, etc.) — let triggerFlow
+      // add its own user message from FLOW_TRIGGER_TEXT and handle the response.
+      triggerFlow(flowId)
     }
   }
 

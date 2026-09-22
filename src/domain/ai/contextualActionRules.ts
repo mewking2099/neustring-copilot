@@ -1,105 +1,50 @@
-import type { DealState } from '@/domain/deal/types'
+import type { DealShell } from '@/domain/deal/types'
+import type { StatementCard } from '@/domain/deal/cardTypes'
 
 export interface ContextualAction {
   id: string
   label: string
-  icon: string  // Lucide icon name as a string key — component resolves it
+  icon: string
   type: 'add' | 'copy' | 'explain' | 'warn'
-  handler: 'copyToOutbound' | 'addVoiceMT' | 'addGPRS' | 'explainBUB'
-    | 'addDataStatement' | 'addVoiceStatement' | 'addSMSStatement'
+  handler: 'explainBUB' | 'explainOverride' | 'explainRates' | 'explainQualifying' | 'explainBilateral'
 }
 
-export function deriveContextualActions(state: DealState): ContextualAction[] {
-  const { shell, statements } = state
+export function deriveContextualActions(
+  shell: DealShell | null,
+  cards: StatementCard[],
+): ContextualAction[] {
   const actions: ContextualAction[] = []
 
-  const inbound = statements.filter(s => s.direction === 'inbound')
-  const outbound = statements.filter(s => s.direction === 'outbound')
-  const shellServices = shell?.serviceTypes ?? []
-
-  const hasData  = shellServices.some(t => ['gprs', 'lte_m', 'nb_iot', '5g'].includes(t))
-  const hasVoice = shellServices.some(t => ['voice_mo', 'voice_mt'].includes(t))
-  const hasSms   = shellServices.includes('sms')
-
-  // Empty canvas — suggest contextual add actions based on what the deal covers
-  if (statements.length === 0) {
-    if (hasData) {
-      actions.push({
-        id: 'add-data-first',
-        label: '+ Add Data statement',
-        icon: 'Plus',
-        type: 'add',
-        handler: 'addDataStatement',
-      })
-    }
-    if (hasVoice) {
-      actions.push({
-        id: 'add-voice-first',
-        label: '+ Add Voice statement',
-        icon: 'Plus',
-        type: 'add',
-        handler: 'addVoiceStatement',
-      })
-    }
-    if (hasSms) {
-      actions.push({
-        id: 'add-sms-first',
-        label: '+ Add SMS statement',
-        icon: 'Plus',
-        type: 'add',
-        handler: 'addSMSStatement',
-      })
-    }
-    // Fallback if no shell services declared yet
-    if (actions.length === 0) {
-      actions.push({
-        id: 'add-data-fallback',
-        label: '+ Add first statement',
-        icon: 'Plus',
-        type: 'add',
-        handler: 'addDataStatement',
-      })
-    }
-    return actions.slice(0, 4)
+  if (!shell || cards.length === 0) {
+    actions.push({
+      id: 'explain-qualifying',
+      label: '? How do statements get created?',
+      icon: 'HelpCircle',
+      type: 'explain',
+      handler: 'explainQualifying',
+    })
+    return actions
   }
 
-  // Inbound exists but outbound empty → offer copy
-  if (inbound.length > 0 && outbound.length === 0) {
+  const allRows = cards.flatMap((c) => c.serviceRows)
+  const layer2  = cards.filter((c) => c.layer === 2)
+
+  // Blank rates on some rows → prompt to fill them
+  const emptyRows = allRows.filter(
+    (r) => r.inboundDiscount === null && r.outboundDiscount === null,
+  )
+  if (emptyRows.length > 0) {
     actions.push({
-      id: 'copy-to-outbound',
-      label: 'Mirror to Outbound',
-      icon: 'ArrowLeftRight',
-      type: 'copy',
-      handler: 'copyToOutbound',
+      id: 'explain-rates',
+      label: `? What discount rate to enter?`,
+      icon: 'HelpCircle',
+      type: 'explain',
+      handler: 'explainRates',
     })
   }
 
-  // Missing voice MT statement
-  const hasVoiceMT = statements.some(s => s.serviceTypes.includes('voice_mt'))
-  if (!hasVoiceMT && hasVoice) {
-    actions.push({
-      id: 'add-voice-mt',
-      label: '+ Add Voice MT',
-      icon: 'Plus',
-      type: 'add',
-      handler: 'addVoiceMT',
-    })
-  }
-
-  // Missing GPRS statement
-  const hasGPRS = statements.some(s => s.serviceTypes.includes('gprs'))
-  if (!hasGPRS && hasData) {
-    actions.push({
-      id: 'add-gprs',
-      label: '+ Add GPRS Data',
-      icon: 'Plus',
-      type: 'add',
-      handler: 'addGPRS',
-    })
-  }
-
-  // B/UB model in use → contextual explain (kept as it's deal-state-aware)
-  const hasBUB = statements.some(s => s.model.family === 'B')
+  // B/UB model in use → explain
+  const hasBUB = allRows.some((r) => r.model.family === 'B')
   if (hasBUB) {
     actions.push({
       id: 'explain-bub',
@@ -107,6 +52,29 @@ export function deriveContextualActions(state: DealState): ContextualAction[] {
       icon: 'HelpCircle',
       type: 'explain',
       handler: 'explainBUB',
+    })
+  }
+
+  // No layer-2 overrides yet → explain the concept
+  if (layer2.length === 0 && shell.roamingPartners.length > 0) {
+    actions.push({
+      id: 'explain-override',
+      label: '? When to add a partner override?',
+      icon: 'HelpCircle',
+      type: 'explain',
+      handler: 'explainOverride',
+    })
+  }
+
+  // Bilateral card → explain what bilateral means
+  const hasBilateral = cards.some((c) => c.direction === 'bilateral')
+  if (hasBilateral) {
+    actions.push({
+      id: 'explain-bilateral',
+      label: '? What is bilateral pricing?',
+      icon: 'HelpCircle',
+      type: 'explain',
+      handler: 'explainBilateral',
     })
   }
 

@@ -1,5 +1,7 @@
 import { Settings, Unlink, Trash2, ChevronDown } from 'lucide-react'
 import { useDealStore } from '@/store/deal'
+import { ScopeBadge } from './ScopeBadge'
+import { BandEditor } from './BandEditor'
 import type { DiscountModel, ServiceType, RoamingChannel, ApplyTo } from '@/domain/deal/types'
 import {
   MODEL_OPTIONS,
@@ -50,7 +52,7 @@ const MODEL_FAMILY_LABELS: Record<string, string> = {
 }
 const MODEL_FAMILIES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
 
-// ── RateRow — compact in/out rate display ─────────────────────────────────────
+// ── RateRow — direction header + multi-band editor (Layer 3) ─────────────────
 function RateRow({
   label,
   statementId,
@@ -64,94 +66,30 @@ function RateRow({
   const updateStatement = useDealStore((s) => s.updateStatement)
 
   if (!statement) return null
-  const band = statement.bands[0] ?? { from: 0, to: null, unit: 'volume', discount: null, discountUnit: 'volume' }
-
-  function updateBand(patch: Partial<typeof band>) {
-    updateStatement(statementId, { bands: [{ ...band, ...patch }] })
-  }
-
-  const inputCls = cn(
-    'w-14 text-center text-xs border border-[#e4e7ec] rounded px-1 py-1 outline-none',
-    editable ? 'focus:border-[#82bc34] bg-white' : 'bg-[#f9fafb] text-[#98a2b3] cursor-not-allowed',
-  )
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-[#f2f4f7] last:border-0 bg-[#fafafa]">
+    <div className="px-4 py-2.5 border-b border-[#f2f4f7] last:border-0 bg-[#fafafa]">
       {/* Direction label */}
-      <span
-        className={cn(
-          'text-[9px] font-bold uppercase tracking-widest shrink-0 w-12 text-center py-0.5 rounded',
-          label === 'INBOUND' ? 'bg-[#eef2f7] text-[#344054]' : 'bg-[#f2f4f7] text-[#667085]',
-        )}
-      >
-        {label === 'INBOUND' ? 'IN' : 'OUT'}
-      </span>
-
-      {/* Interval */}
-      <div className="flex items-center gap-1 flex-[2]">
-        <input
-          type="number"
-          value={band.from ?? ''}
-          onChange={(e) => editable && updateBand({ from: e.target.value === '' ? null : Number(e.target.value) })}
-          readOnly={!editable}
-          className={inputCls}
-          placeholder="0"
-        />
-        <span className="text-[#98a2b3] text-xs">–</span>
-        <input
-          type="number"
-          value={band.to ?? ''}
-          onChange={(e) => editable && updateBand({ to: e.target.value === '' ? null : Number(e.target.value) })}
-          readOnly={!editable}
-          className={inputCls}
-          placeholder="∞"
-        />
-        <select
-          value={band.unit}
-          onChange={(e) => editable && updateBand({ unit: e.target.value as 'volume' | 'charge' | 'imsi' })}
-          disabled={!editable}
+      <div className="flex items-center gap-2 mb-2">
+        <span
           className={cn(
-            'text-xs border border-[#e4e7ec] rounded px-1 py-1 outline-none',
-            editable ? 'bg-white focus:border-[#82bc34]' : 'bg-[#f9fafb] text-[#98a2b3]',
+            'text-[9px] font-bold uppercase tracking-widest shrink-0 px-2 py-0.5 rounded',
+            label === 'INBOUND' ? 'bg-[#eef2f7] text-[#344054]' : 'bg-[#f2f4f7] text-[#667085]',
           )}
         >
-          <option value="volume">Volume</option>
-          <option value="charge">Charge</option>
-          <option value="imsi">IMSI</option>
-        </select>
-      </div>
-
-      {/* Discount */}
-      <div className="flex items-center gap-1 flex-[1]">
-        <input
-          type="number"
-          value={band.discount ?? ''}
-          onChange={(e) => editable && updateBand({ discount: e.target.value === '' ? null : Number(e.target.value) })}
-          readOnly={!editable}
-          className={inputCls}
-          placeholder="–"
-        />
-        <select
-          value={band.discountUnit}
-          onChange={(e) => editable && updateBand({ discountUnit: e.target.value as 'volume' | 'percentage' | 'fixed' })}
-          disabled={!editable}
-          className={cn(
-            'text-xs border border-[#e4e7ec] rounded px-1 py-1 outline-none',
-            editable ? 'bg-white focus:border-[#82bc34]' : 'bg-[#f9fafb] text-[#98a2b3]',
-          )}
-        >
-          <option value="volume">Volume</option>
-          <option value="percentage">%</option>
-          <option value="fixed">Fixed</option>
-        </select>
-      </div>
-
-      {/* Mirror indicator when not editable */}
-      <div className="flex-[1]">
+          {label === 'INBOUND' ? 'IN' : 'OUT'}
+        </span>
         {!editable && (
           <span className="text-[10px] text-[#82bc34] font-medium">↑ mirroring inbound</span>
         )}
       </div>
+
+      {/* Band editor */}
+      <BandEditor
+        bands={statement.bands}
+        editable={editable}
+        onChange={(next) => updateStatement(statementId, { bands: next })}
+      />
     </div>
   )
 }
@@ -196,8 +134,8 @@ export function PairedStatementRow({ inboundId, outboundId, onOpenSettings, coll
 
   return (
     <div className="bg-white rounded-xl border border-[#e4e7ec] shadow-sm overflow-hidden flex">
-      {/* Lime left-rail — encodes pairing structurally, not via background color */}
-      <div className="w-1 shrink-0 bg-[#82bc34] rounded-l-xl" />
+      {/* Left rail — lime for Layer 1, navy for Layer 2 override */}
+      <div className={cn('w-1 shrink-0 rounded-l-xl', inbound.layer === 2 ? 'bg-[#0e2c46]' : 'bg-[#82bc34]')} />
 
       <div className="flex-1 min-w-0">
       {/* Pair header */}
@@ -209,6 +147,11 @@ export function PairedStatementRow({ inboundId, outboundId, onOpenSettings, coll
           Paired
         </span>
         <span className="text-xs font-medium text-[#344054] truncate">{serviceLabel}</span>
+
+        {/* Scope badge — Layer 2 partner override */}
+        {inbound.layer === 2 && inbound.scopedPartners && (
+          <ScopeBadge partners={inbound.scopedPartners} />
+        )}
 
         <div className="ml-auto flex items-center gap-2">
           {/* Collapse toggle */}

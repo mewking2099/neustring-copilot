@@ -67,8 +67,11 @@ export interface Statement {
   applyTo: ApplyTo
   settings: StatementSettings
   createdAt: string
-  linkedStatementId?: string  // id of the paired counterpart (undefined = standalone)
-  mirrorMode?: boolean        // when true, shared-field edits propagate to the linked counterpart
+  linkedStatementId?: string    // id of the paired counterpart (undefined = standalone)
+  mirrorMode?: boolean          // when true, shared-field edits propagate to the linked counterpart
+  layer?: 1 | 2                 // 1 = global (all partners), 2 = partner-specific override
+  parentStatementId?: string    // Layer 2 only — canonical inbound/single parent id
+  scopedPartners?: string[]     // Layer 2 only — TADIG codes this override applies to
 }
 
 // Access level
@@ -104,7 +107,7 @@ export interface ChangeLogEntry {
 }
 
 // Entry source (how the deal was started)
-export type EntrySource = 'scratch_wizard' | 'scratch_dialog' | 'email_ingestion' | 'file_ingestion' | 'cloned_deal'
+export type EntrySource = 'scratch_wizard' | 'scratch_dialog' | 'email_ingestion' | 'file_ingestion' | 'cloned_deal' | 'qualifying_intake'
 
 // Full deal state
 export interface DealState {

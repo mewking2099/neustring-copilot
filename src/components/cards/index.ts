@@ -15,6 +15,8 @@ import { TadigCard }             from "./TadigCard"
 import { ContractReviewCard }    from "./ContractReviewCard"
 import { ContractUploadCard }    from "./ContractUploadCard"
 import { ContractAnalysisCard }  from "./ContractAnalysisCard"
+import { DealCreateOptionsCard } from "./DealCreateOptionsCard"
+import { DealClonePickerCard }   from "./DealClonePickerCard"
 
 export interface CardProps {
   onChip?: (flowId: string) => void
@@ -37,4 +39,6 @@ export const CARD_REGISTRY: Record<string, ComponentType<CardProps>> = {
   "contract-review-analyze":      ContractReviewCard,
   "contract-review-compare":      ContractUploadCard,
   "contract-review-compare-result": ContractAnalysisCard,
+  "deal-create-options":          DealCreateOptionsCard,
+  "deal-clone-picker":            DealClonePickerCard,
 }

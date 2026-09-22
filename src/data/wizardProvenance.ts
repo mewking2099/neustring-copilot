@@ -133,3 +133,40 @@ export function getAutoRenewalSuggestion(
   const yesCount = deals.filter((d) => d.autoRenewal).length
   return { value: yesCount > deals.length / 2, count: yesCount, total: deals.length }
 }
+
+export interface InferredRateSuggestion extends RateSuggestion {
+  inferredFrom: string
+  inferredFromName: string
+}
+
+// Returns a nearest-neighbour rate suggestion when no direct history exists.
+// Uses the most recent deal from any partner as a comparable (Tier 2 provenance).
+export function getInferredRateSuggestion(
+  tadig: string,
+  service: 'data' | 'voice' | 'sms' | 'iot',
+): InferredRateSuggestion | null {
+  // Only fires when partner has no direct history
+  if (byPartner(tadig).length > 0) return null
+
+  const allWithService = DEAL_HISTORY
+    .filter((d) => d.rates[service] !== undefined)
+    .sort((a, b) => b.closedAtISO.localeCompare(a.closedAtISO))
+
+  if (!allWithService.length) return null
+
+  const comparable = allWithService[0]
+  const values = allWithService.slice(0, 3).map((d) => d.rates[service]!)
+  const avg = Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 1000) / 1000
+
+  return {
+    value: comparable.rates[service]!,
+    min: Math.min(...values),
+    max: Math.max(...values),
+    avg,
+    sourceId: comparable.id,
+    sourceDate: comparable.closedAt,
+    sampleSize: allWithService.length,
+    inferredFrom: comparable.partner,
+    inferredFromName: comparable.partnerName,
+  }
+}

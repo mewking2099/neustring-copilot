@@ -22,13 +22,9 @@ export function AssistantInput({ extraMessages = [] }: Props) {
   const [isTyping, setIsTyping] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  const state = useDealStore(useShallow((s) => ({
-    shell: s.shell,
-    statements: s.statements,
-    aiChangeLog: s.aiChangeLog,
-    entrySource: s.entrySource,
-    draftId: s.draftId,
-  })))
+  const { shell, cards } = useDealStore(
+    useShallow((s) => ({ shell: s.shell, cards: s.cards })),
+  )
 
   // Merge extra messages (from ContextualActions) with local thread
   const allMessages = [...localMessages, ...extraMessages].sort((a, b) =>
@@ -50,7 +46,7 @@ export function AssistantInput({ extraMessages = [] }: Props) {
 
     await new Promise<void>((resolve) => setTimeout(resolve, 800))
 
-    const response = getMockResponseFromText(text, state)
+    const response = getMockResponseFromText(text, shell, cards)
     setIsTyping(false)
     setLocalMessages((prev) => [...prev, { id: nextId(), role: 'ai', text: response }])
   }
@@ -59,6 +55,27 @@ export function AssistantInput({ extraMessages = [] }: Props) {
     <div className="flex flex-col flex-1 overflow-hidden min-h-0">
       {/* Message bubbles */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+        {allMessages.length === 0 && !isTyping && (
+          <div className="flex flex-col gap-2 pt-1">
+            <p className="text-[10px] text-[#98a2b3] font-semibold uppercase tracking-widest px-1">
+              Ask me anything
+            </p>
+            {[
+              'What is bilateral pricing?',
+              'When should I add a partner override?',
+              'What discount rate should I enter?',
+            ].map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => { setInputVal(q); }}
+                className="text-left text-xs text-[#344054] bg-[#f2f4f7] hover:bg-[#e8edf5] rounded-lg px-3 py-2 transition-colors leading-snug"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
         {allMessages.map((msg) => (
           <div
             key={msg.id}
