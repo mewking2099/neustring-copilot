@@ -36,7 +36,7 @@ export function DealPageView() {
         <div className="text-center">
           <p className="text-sm font-semibold text-[#344054] mb-1">No deal loaded</p>
           <p className="text-xs text-[#98a2b3] max-w-xs leading-relaxed">
-            Start a new deal from the wizard or open an existing deal from your dashboard.
+            Create a new deal or open an existing one from your dashboard.
           </p>
         </div>
         <Link
