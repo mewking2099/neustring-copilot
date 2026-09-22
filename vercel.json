@@ -5,11 +5,7 @@
       "destination": "/index.html"
     }
   ],
-  "experimentalServices": {
-    "web": {
-      "routePrefix": "/",
-      "framework": "vite",
-      "buildCommand": "npm install && npm run build"
-    }
-  }
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite"
 }
