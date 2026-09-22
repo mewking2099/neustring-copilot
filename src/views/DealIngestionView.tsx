@@ -140,7 +140,6 @@ export function DealIngestionView({ mode, onBack }: Props) {
     const shell = buildFullShell(result.shell, result.statements)
     const store = useDealStore.getState()
     store.initShell(shell, result.source === 'email' ? 'email_ingestion' : 'file_ingestion')
-    useDealStore.setState({ statements: result.statements })
     store.logChange(`Deal seeded from ingestion (${result.sourceName})`, 'ingestion')
     navigate(`/deal/${shell.id}`)
   }

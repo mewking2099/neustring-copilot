@@ -22,11 +22,14 @@ const MODEL_FAMILY_LABELS: Record<string, string> = {
 const MODEL_FAMILIES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
 
 function encodeModel(m: DiscountModel): string {
-  if ('variant' in m)      return `${m.family}:${m.variant}`
-  if ('method' in m)       return `${m.family}:${m.method}`
-  if ('distribution' in m) return `${m.family}:${m.distribution}`
-  if ('subtype' in m)      return `${m.family}:${m.subtype}`
-  return m.family
+  switch (m.family) {
+    case 'A': return `A:${m.variant}`
+    case 'B': return `B:${m.method}`
+    case 'C': return `C:${m.variant}`
+    case 'D': return `D:${m.variant}`
+    case 'E': return `E:${m.distribution}`
+    case 'F': return `F:${m.subtype}`
+  }
 }
 
 function decodeModel(key: string): DiscountModel {
@@ -42,11 +45,7 @@ function decodeModel(key: string): DiscountModel {
   }
 }
 
-function modelBadge(m: DiscountModel): string {
-  const key = encodeModel(m)
-  return MODEL_OPTIONS.find((o) => encodeModel(o as unknown as DiscountModel) === key)?.label
-    ?? (MODEL_FAMILY_LABELS[m.family] ?? key)
-}
+
 
 interface Props {
   cardId: string
@@ -114,7 +113,7 @@ export function ServiceRowEditor({ cardId, row, canDelete, isLast }: Props) {
               return (
                 <optgroup key={fam} label={MODEL_FAMILY_LABELS[fam]}>
                   {opts.map((o) => {
-                    const key = `${o.family}:${'variant' in o ? o.variant : 'method' in o ? o.method : 'distribution' in o ? o.distribution : 'subtype' in o ? o.subtype : ''}`
+                    const key = `${o.family}:${o.variant}`
                     return <option key={key} value={key}>{o.label}</option>
                   })}
                 </optgroup>
