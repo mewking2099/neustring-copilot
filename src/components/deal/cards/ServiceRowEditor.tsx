@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Trash2, Plus, ChevronDown } from 'lucide-react'
 import { useDealStore } from '@/store/deal'
 import type { ServiceRow } from '@/domain/deal/cardTypes'
-import type { ServiceType, DiscountModel } from '@/domain/deal/types'
+import type { ServiceType, DiscountModel, ApplyTo } from '@/domain/deal/types'
 import { SERVICE_TYPE_LABELS, MODEL_OPTIONS } from '@/domain/deal/discountFamilies'
 import { cn } from '@/lib/utils'
 
@@ -20,6 +20,12 @@ const MODEL_FAMILY_LABELS: Record<string, string> = {
 }
 
 const MODEL_FAMILIES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
+
+const APPLY_TO_OPTIONS: { value: string; label: string }[] = [
+  { value: 'threshold',     label: 'Threshold' },
+  { value: 'retrospective', label: 'Retrospective' },
+  { value: 'back_to_first', label: 'Back to First' },
+]
 
 function encodeModel(m: DiscountModel): string {
   switch (m.family) {
@@ -64,10 +70,12 @@ export function ServiceRowEditor({ cardId, row, canDelete, isLast }: Props) {
   }
 
   function addBand() {
+    const prev = row.additionalBands[row.additionalBands.length - 1]
+    const nextFrom = prev?.to != null ? prev.to + 1 : null
     patch({
       additionalBands: [
         ...row.additionalBands,
-        { label: '', inboundDiscount: null, outboundDiscount: null },
+        { from: nextFrom, to: null, unit: 'volume', inboundDiscount: null, outboundDiscount: null },
       ],
     })
   }
@@ -122,15 +130,17 @@ export function ServiceRowEditor({ cardId, row, canDelete, isLast }: Props) {
           </select>
         </td>
 
-        {/* High cost / destinations */}
+        {/* Apply To */}
         <td className="px-3 py-2 w-36">
-          <input
-            type="text"
-            value={row.highCostFilter ?? ''}
-            onChange={(e) => patch({ highCostFilter: e.target.value || null })}
-            placeholder="—"
-            className="w-full text-xs border border-[#e4e7ec] rounded-lg px-2 py-1.5 bg-white text-[#344054] outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
-          />
+          <select
+            value={row.applyTo ?? 'threshold'}
+            onChange={(e) => patch({ applyTo: e.target.value as ApplyTo })}
+            className="w-full text-xs border border-[#e4e7ec] rounded-lg px-2 py-1.5 bg-white text-[#344054] outline-none focus:border-[#82bc34]"
+          >
+            {APPLY_TO_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
         </td>
 
         {/* Charge unit */}
@@ -198,33 +208,68 @@ export function ServiceRowEditor({ cardId, row, canDelete, isLast }: Props) {
         <tr>
           <td colSpan={7} className="px-3 pb-2">
             <div className="ml-4 border-l-2 border-[#e4e7ec] pl-3 flex flex-col gap-1">
+              {/* High cost destination (de-prioritised) */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[9px] font-bold text-[#98a2b3] uppercase tracking-widest w-28 shrink-0">High Cost Dest.</span>
+                <input
+                  type="text"
+                  value={row.highCostFilter ?? ''}
+                  onChange={(e) => patch({ highCostFilter: e.target.value || null })}
+                  placeholder="e.g. 210 Countries"
+                  className="flex-1 text-xs border border-[#e4e7ec] rounded px-2 py-1 outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
+                />
+              </div>
+
               <p className="text-[9px] font-bold text-[#98a2b3] uppercase tracking-widest mb-1">
                 Additional rate bands
               </p>
               {row.additionalBands.map((band, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-[#98a2b3] w-5">B{i + 2}</span>
+                <div key={i} className="flex items-center gap-1.5">
+                  <span className="text-[9px] font-bold text-[#98a2b3] w-5 shrink-0">B{i + 2}</span>
+
+                  {/* Volume range */}
                   <input
-                    type="text"
-                    value={band.label}
-                    onChange={(e) => updateBand(i, { label: e.target.value })}
-                    placeholder="e.g. 41 Countries"
-                    className="flex-1 text-xs border border-[#e4e7ec] rounded px-2 py-1 outline-none focus:border-[#82bc34]"
+                    type="number"
+                    value={band.from ?? ''}
+                    onChange={(e) => updateBand(i, { from: e.target.value === '' ? null : Number(e.target.value) })}
+                    placeholder="From"
+                    className="w-20 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#344054] outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
                   />
+                  <span className="text-[10px] text-[#98a2b3]">–</span>
+                  <input
+                    type="number"
+                    value={band.to ?? ''}
+                    onChange={(e) => updateBand(i, { to: e.target.value === '' ? null : Number(e.target.value) })}
+                    placeholder="∞"
+                    className="w-20 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#344054] outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
+                  />
+
+                  {/* Unit */}
+                  <select
+                    value={band.unit}
+                    onChange={(e) => updateBand(i, { unit: e.target.value as 'volume' | 'charge' })}
+                    className="text-xs border border-[#e4e7ec] rounded px-1.5 py-1 bg-white text-[#344054] outline-none focus:border-[#82bc34]"
+                  >
+                    <option value="volume">Vol</option>
+                    <option value="charge">Charge</option>
+                  </select>
+
+                  {/* Inbound / Outbound discounts */}
                   <input
                     type="number"
                     value={band.inboundDiscount ?? ''}
                     onChange={(e) => updateBand(i, { inboundDiscount: e.target.value === '' ? null : Number(e.target.value) })}
-                    placeholder="IN"
-                    className="w-16 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#0e2c46] outline-none focus:border-[#82bc34]"
+                    placeholder="IN %"
+                    className="w-16 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#0e2c46] outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
                   />
                   <input
                     type="number"
                     value={band.outboundDiscount ?? ''}
                     onChange={(e) => updateBand(i, { outboundDiscount: e.target.value === '' ? null : Number(e.target.value) })}
-                    placeholder="OUT"
-                    className="w-16 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#d04a02] outline-none focus:border-[#82bc34]"
+                    placeholder="OUT %"
+                    className="w-16 text-xs border border-[#e4e7ec] rounded px-2 py-1 text-right text-[#d04a02] outline-none focus:border-[#82bc34] placeholder:text-[#98a2b3]"
                   />
+
                   <button
                     type="button"
                     onClick={() => removeBand(i)}

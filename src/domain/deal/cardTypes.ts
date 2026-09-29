@@ -1,4 +1,4 @@
-import type { ServiceType, DiscountModel } from './types'
+import type { ServiceType, DiscountModel, ApplyTo } from './types'
 
 export type CardDirection = 'bilateral' | 'inbound' | 'outbound'
 
@@ -7,13 +7,16 @@ export interface ServiceRow {
   id: string
   serviceType: ServiceType
   model: DiscountModel
+  applyTo: ApplyTo                // threshold | retrospective | back_to_first
   highCostFilter: string | null   // e.g. "210 Countries", null = standard
   chargeUnit: string              // e.g. "Per Min (60/30 s)", "Per Unit", "Per MB (1MB/1MB)"
   inboundDiscount: number | null
   outboundDiscount: number | null
-  // Layer 3 — additional rate bands (high-cost country splits, volume tiers, etc.)
+  // Layer 3 — volume / charge tier bands
   additionalBands: Array<{
-    label: string                 // e.g. "1 Country", "41 Countries"
+    from: number | null            // lower bound (inclusive); null = 0
+    to: number | null              // upper bound (inclusive); null = ∞
+    unit: 'volume' | 'charge'     // minutes / MB / units vs. currency amount
     inboundDiscount: number | null
     outboundDiscount: number | null
   }>

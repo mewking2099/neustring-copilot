@@ -61,6 +61,7 @@ function defaultServiceRow(partial?: Partial<ServiceRow>): ServiceRow {
     id:               makeId(),
     serviceType:      'voice_mo',
     model:            { family: 'A', variant: 'threshold' },
+    applyTo:          'threshold',
     highCostFilter:   null,
     chargeUnit:       'Per Min (60/30 s)',
     inboundDiscount:  null,

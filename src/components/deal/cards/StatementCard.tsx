@@ -154,7 +154,7 @@ export function StatementCard({ card, shell }: Props) {
               <tr className="bg-[#f9fafb] border-b border-[#e4e7ec]">
                 <th className="px-3 py-2 text-left text-[9px] font-bold text-[#667085] uppercase tracking-wider w-36">Service Type</th>
                 <th className="px-3 py-2 text-left text-[9px] font-bold text-[#667085] uppercase tracking-wider w-44">Discount Model</th>
-                <th className="px-3 py-2 text-left text-[9px] font-bold text-[#667085] uppercase tracking-wider w-36">High Cost Dest.</th>
+                <th className="px-3 py-2 text-left text-[9px] font-bold text-[#667085] uppercase tracking-wider w-36">Apply To</th>
                 <th className="px-3 py-2 text-left text-[9px] font-bold text-[#667085] uppercase tracking-wider w-44">Charge Unit</th>
                 <th className="px-3 py-2 text-right text-[9px] font-bold text-[#2563eb] uppercase tracking-wider w-24">Inbound</th>
                 <th className="px-3 py-2 text-right text-[9px] font-bold text-[#dc4f00] uppercase tracking-wider w-24">Outbound</th>
